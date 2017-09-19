@@ -19,7 +19,7 @@ namespace Lykke.Service.Wallets.Client
             _log = log;
         }
 
-        public async Task<IList<ClientBalanceResponseModel>> GetClientBalances(string clientId)
+        public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
         {
             try
             {
@@ -32,15 +32,19 @@ namespace Lykke.Service.Wallets.Client
             }
         }
 
-        public async Task<ClientBalanceModel> GetClientBalanceByAssetId(string clientId, string assetId)
+        public async Task<ClientBalanceModel> GetClientBalanceByAssetId(ClientBalanceByAssetIdModel model)
         {
             try
             {
-                return ClientBalanceModel.Create(_service.GetClientBalancesByAssetId(clientId, assetId));
+                return ClientBalanceModel.Create(_service.GetClientBalancesByAssetId(new ClientBalanceByAssetIdModel()
+                {
+                    ClientId = model.ClientId,
+                    AssetId = model.AssetId
+                }));
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetClientBalances), $"clientId = {clientId}", ex);
+                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetClientBalances), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
                 return ClientBalanceModel.Create(new ClientBalanceResponseModel() { ErrorMessage = ex.Message });
             }
         }

@@ -46,13 +46,13 @@ namespace Lykke.Service.Wallets.Controllers
         }
 
         [HttpGet]
-        [Route("getClientBalancesByAssetId/{clientId}/{assetid}")]
+        [Route("getClientBalancesByAssetId")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
-        public async Task<ClientBalanceResponseModel> GetClientBalancesByAssetId(string clientId, string assetId)
+        public async Task<ClientBalanceResponseModel> GetClientBalancesByAssetId([FromBody]ClientBalanceByAssetIdModel model)
         {
             try
             {
-                var wallet = await _walletsRepository.GetAsync(clientId, assetId);
+                var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
                 if (wallet != null)
                 {
                     return ClientBalanceResponseModel.Create(wallet);
@@ -62,7 +62,7 @@ namespace Lykke.Service.Wallets.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController), nameof(GetClientBalancesByAssetId), $"clientId = {clientId}, assetId = {assetId}", ex);
+                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController), nameof(GetClientBalancesByAssetId), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
                 return ClientBalanceResponseModel.CreateErrorMessage(ex.Message);
             }
         }

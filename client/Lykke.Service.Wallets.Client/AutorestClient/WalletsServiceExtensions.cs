@@ -69,28 +69,24 @@ namespace Lykke.Service.Wallets.Client.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='clientId'>
+            /// <param name='model'>
             /// </param>
-            /// <param name='assetId'>
-            /// </param>
-            public static ClientBalanceResponseModel GetClientBalancesByAssetId(this IWalletsService operations, string clientId, string assetId)
+            public static ClientBalanceResponseModel GetClientBalancesByAssetId(this IWalletsService operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel))
             {
-                return operations.GetClientBalancesByAssetIdAsync(clientId, assetId).GetAwaiter().GetResult();
+                return operations.GetClientBalancesByAssetIdAsync(model).GetAwaiter().GetResult();
             }
 
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='clientId'>
-            /// </param>
-            /// <param name='assetId'>
+            /// <param name='model'>
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ClientBalanceResponseModel> GetClientBalancesByAssetIdAsync(this IWalletsService operations, string clientId, string assetId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ClientBalanceResponseModel> GetClientBalancesByAssetIdAsync(this IWalletsService operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(clientId, assetId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

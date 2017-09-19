@@ -7,7 +7,7 @@ namespace Lykke.Service.Wallets.Client
 {
     public interface IWalletsClient
     {
-        Task<IList<ClientBalanceResponseModel>> GetClientBalances(string clientId);
-        Task<ClientBalanceModel> GetClientBalanceByAssetId(string clientId, string assetId);
+        Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId);
+        Task<ClientBalanceModel> GetClientBalanceByAssetId(ClientBalanceByAssetIdModel model);
     }
 }
