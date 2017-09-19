@@ -59,7 +59,7 @@ namespace Lykke.Service.Wallets
                 ? Configuration.Get<AppSettings>()
                 : SettingsProcessor.Process<AppSettings>(Configuration["SettingsUrl"].GetStringAsync().Result);
 
-            builder.RegisterModule(new ServiceModule(appSettings.WalletsService));
+            builder.RegisterModule(new ServiceModule(appSettings.WalletsServiceSettings));
             builder.Populate(services);
 
             ApplicationContainer = builder.Build();
