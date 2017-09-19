@@ -9,27 +9,26 @@ namespace Lykke.Service.Wallets.Client.AutorestClient.Models
     using Lykke.Service.Wallets.Client;
     using Lykke.Service.Wallets.Client.AutorestClient;
     using Newtonsoft.Json;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
 
-    public partial class ErrorResponse
+    public partial class ClientBalanceResponseModel
     {
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the ClientBalanceResponseModel class.
         /// </summary>
-        public ErrorResponse()
+        public ClientBalanceResponseModel()
         {
           CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the ClientBalanceResponseModel class.
         /// </summary>
-        public ErrorResponse(IDictionary<string, IList<string>> errorMessages = default(IDictionary<string, IList<string>>), IDictionary<string, IList<string>> modelErrors = default(IDictionary<string, IList<string>>))
+        public ClientBalanceResponseModel(string assetId = default(string), double? balance = default(double?), string errorMessage = default(string))
         {
-            ErrorMessages = errorMessages;
-            ModelErrors = modelErrors;
+            AssetId = assetId;
+            Balance = balance;
+            ErrorMessage = errorMessage;
             CustomInit();
         }
 
@@ -40,13 +39,18 @@ namespace Lykke.Service.Wallets.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ErrorMessages")]
-        public IDictionary<string, IList<string>> ErrorMessages { get; private set; }
+        [JsonProperty(PropertyName = "AssetId")]
+        public string AssetId { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ModelErrors")]
-        public IDictionary<string, IList<string>> ModelErrors { get; private set; }
+        [JsonProperty(PropertyName = "Balance")]
+        public double? Balance { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "ErrorMessage")]
+        public string ErrorMessage { get; set; }
 
     }
 }

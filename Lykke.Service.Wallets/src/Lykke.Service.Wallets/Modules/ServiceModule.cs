@@ -2,7 +2,9 @@
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Logs;
+using Lykke.Service.Wallets.AzureRepositories;
 using Lykke.Service.Wallets.Core;
+using Lykke.Service.Wallets.Core.Wallets;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Lykke.Service.Wallets.Modules
@@ -36,11 +38,10 @@ namespace Lykke.Service.Wallets.Modules
             builder.RegisterInstance(log)
                 .As<ILog>()
                 .SingleInstance();
+
+            builder.RegisterInstance<IWalletsRepository>(
+              AzureRepoFactories.CreateWalletsRepository(_settings.Db.ClientPersonalInfoConnString, log)
+          ).SingleInstance();
         }
-
-        //  builder.RegisterInstance<IClientAccountsRepository>(
-        //    AzureRepoFactories.CreateTradersRepository(_settings.Db.ClientPersonalInfoConnString, log)
-        //).SingleInstance();
-
     }
 }

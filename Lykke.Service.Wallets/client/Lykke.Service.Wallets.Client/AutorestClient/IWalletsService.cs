@@ -17,7 +17,7 @@ namespace Lykke.Service.Wallets.Client.AutorestClient
 
     /// <summary>
     /// </summary>
-    public partial interface IWalletsAPI : System.IDisposable
+    public partial interface IWalletsService : System.IDisposable
     {
         /// <summary>
         /// The base URI of the service.
@@ -35,9 +35,6 @@ namespace Lykke.Service.Wallets.Client.AutorestClient
         JsonSerializerSettings DeserializationSettings { get; }
 
 
-        /// <summary>
-        /// Checks service is alive
-        /// </summary>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
@@ -45,6 +42,28 @@ namespace Lykke.Service.Wallets.Client.AutorestClient
         /// The cancellation token.
         /// </param>
         Task<HttpOperationResponse<object>> IsAliveWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <param name='clientId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<IList<ClientBalanceResponseModel>>> GetClientBalancesWithHttpMessagesAsync(string clientId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <param name='clientId'>
+        /// </param>
+        /// <param name='assetId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ClientBalanceResponseModel>> GetClientBalancesByAssetIdWithHttpMessagesAsync(string clientId, string assetId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }
