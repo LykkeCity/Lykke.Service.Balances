@@ -24,16 +24,12 @@ namespace Lykke.Service.Wallets.Modules
             builder.RegisterInstance(_settings)
                 .SingleInstance();
 
-
             var consoleLogger = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
-
-
 
             var log = new LykkeLogToAzureStorage(PlatformServices.Default.Application.ApplicationName,
                                      new LykkeLogToAzureStoragePersistenceManager(nameof(Wallets),
                                      AzureTableStorage<LogEntity>.Create(() => _settings.Db.LogsConnString, "LykkeWalletsServiceLog", null)));
-
 
             builder.RegisterInstance(log)
                 .As<ILog>()
@@ -42,6 +38,14 @@ namespace Lykke.Service.Wallets.Modules
             builder.RegisterInstance<IWalletsRepository>(
               AzureRepoFactories.CreateWalletsRepository(_settings.Db.ClientPersonalInfoConnString, log)
           ).SingleInstance();
+
+            builder.RegisterInstance<IWalletCredentialsRepository>(
+              AzureRepoFactories.CreateWalletsCredentialsRepository(_settings.Db.ClientPersonalInfoConnString, log)
+          ).SingleInstance();
+
+            builder.RegisterInstance<IWalletCredentialsHistoryRepository>(
+             AzureRepoFactories.CreateWalletCredentialsHistoryRepository(_settings.Db.ClientPersonalInfoConnString, log)
+         ).SingleInstance();
         }
     }
 }

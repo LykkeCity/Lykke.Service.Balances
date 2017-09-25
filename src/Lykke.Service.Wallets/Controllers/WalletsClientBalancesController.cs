@@ -1,8 +1,6 @@
 ﻿using Common.Log;
 using Lykke.Service.Wallets.Core.Wallets;
-using Lykke.Service.Wallets.Models;
 using Lykke.Service.Wallets.Models.ClientBalances;
-using Lykke.Service.Wallets.Strings;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
@@ -58,7 +56,7 @@ namespace Lykke.Service.Wallets.Controllers
                     return ClientBalanceResponseModel.Create(wallet);
                 }
 
-                return ClientBalanceResponseModel.NoResultFound();
+                return null;
             }
             catch (Exception ex)
             {

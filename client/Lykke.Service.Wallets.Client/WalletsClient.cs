@@ -1,6 +1,7 @@
 ﻿using Common.Log;
 using Lykke.Service.Wallets.Client.AutorestClient;
 using Lykke.Service.Wallets.Client.AutorestClient.Models;
+using Lykke.Service.Wallets.Client.Models;
 using Lykke.Service.Wallets.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
@@ -32,11 +33,11 @@ namespace Lykke.Service.Wallets.Client
             }
         }
 
-        public async Task<ClientBalanceModel> GetClientBalanceByAssetId(ClientBalanceByAssetIdModel model)
+        public async Task<ClientBalanceModel> GetClientBalanceByAssetId(AutorestClient.Models.ClientBalanceByAssetIdModel model)
         {
             try
             {
-                return ClientBalanceModel.Create(_service.GetClientBalancesByAssetId(new ClientBalanceByAssetIdModel()
+                return ClientBalanceModel.Create(_service.GetClientBalancesByAssetId(new AutorestClient.Models.ClientBalanceByAssetIdModel()
                 {
                     ClientId = model.ClientId,
                     AssetId = model.AssetId
@@ -46,6 +47,34 @@ namespace Lykke.Service.Wallets.Client
             {
                 await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetClientBalances), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
                 return ClientBalanceModel.Create(new ClientBalanceResponseModel() { ErrorMessage = ex.Message });
+            }
+        }
+
+        public async Task<WalletCredentialsModel> GetWalletCredential(string clientId)
+        {
+            try
+            {
+                var walletsCredential = _service.GetWalletsCredentials(clientId);
+                return WalletCredentialsModel.Create(walletsCredential);
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
+                return new WalletCredentialsModel() { ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<WalletCredentialsHistoryModel> GetWalletCredentialHistory(string clientId)
+        {
+            try
+            {
+                var walletsCredentialHistory = _service.GetWalletsCredentialsHistory(clientId);
+                return new WalletCredentialsHistoryModel() { WalletsCredentialHistory = walletsCredentialHistory };
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
+                return new WalletCredentialsHistoryModel() { ErrorMessage = ex.Message };
             }
         }
 
