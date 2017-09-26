@@ -20,22 +20,29 @@
 
         public static WalletCredentialsModel Create(AutorestClient.Models.IWalletCredentials src)
         {
-            return new WalletCredentialsModel
+            if (src != null)
             {
-                ClientId = src.ClientId,
-                Address = src.Address,
-                PrivateKey = src.PrivateKey,
-                MultiSig = src.MultiSig,
-                ColoredMultiSig = src.ColoredMultiSig,
-                PreventTxDetection = src.PreventTxDetection,
-                EncodedPrivateKey = src.EncodedPrivateKey,
-                PublicKey = src.PublicKey,
-                BtcConvertionWalletPrivateKey = src.BtcConvertionWalletPrivateKey,
-                BtcConvertionWalletAddress = src.BtcConvertionWalletAddress,
-                EthConversionWalletAddress = src.EthConversionWalletAddress,
-                EthAddress = src.EthAddress,
-                EthPublicKey = src.EthPublicKey
-            };
+                return new WalletCredentialsModel
+                {
+                    ClientId = src.ClientId,
+                    Address = src.Address,
+                    PrivateKey = src.PrivateKey,
+                    MultiSig = src.MultiSig,
+                    ColoredMultiSig = src.ColoredMultiSig,
+                    PreventTxDetection = src.PreventTxDetection,
+                    EncodedPrivateKey = src.EncodedPrivateKey,
+                    PublicKey = src.PublicKey,
+                    BtcConvertionWalletPrivateKey = src.BtcConvertionWalletPrivateKey,
+                    BtcConvertionWalletAddress = src.BtcConvertionWalletAddress,
+                    EthConversionWalletAddress = src.EthConversionWalletAddress,
+                    EthAddress = src.EthAddress,
+                    EthPublicKey = src.EthPublicKey
+                };
+            }
+            else
+            {
+                return new WalletCredentialsModel();
+            }
         }
     }
 }

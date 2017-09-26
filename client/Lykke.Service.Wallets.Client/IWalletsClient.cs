@@ -11,5 +11,6 @@ namespace Lykke.Service.Wallets.Client
         Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId);
         Task<ClientBalanceModel> GetClientBalanceByAssetId(AutorestClient.Models.ClientBalanceByAssetIdModel model);
         Task<WalletCredentialsModel> GetWalletCredential(string clientId);
+        Task<WalletCredentialsHistoryModel> GetWalletCredentialHistory(string clientId);
     }
 }
