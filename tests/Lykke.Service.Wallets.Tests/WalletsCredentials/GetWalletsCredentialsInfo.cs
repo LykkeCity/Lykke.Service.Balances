@@ -10,7 +10,7 @@ namespace Lykke.Service.Wallets.Tests.WalletsCredentials
         private const string ServiceUrl = "http://client-account.lykke-service.svc.cluster.local";
 
 
-        [Fact]
+        [Fact(Skip = "integration test")]
         public async void GetWalletCredentialByClientId()
         {
             var client = new WalletsClient(ServiceUrl, _log);
@@ -20,7 +20,7 @@ namespace Lykke.Service.Wallets.Tests.WalletsCredentials
             Assert.Null(result.ErrorMessage);
         }
 
-        [Fact]
+        [Fact(Skip = "integration test")]
         public async void GetWalletCredentialHistoryByClientIdAndAssetId()
         {
             var client = new WalletsClient(ServiceUrl, _log);
