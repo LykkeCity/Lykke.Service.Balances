@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Lykke.AzureStorage" Version="2.0.1" />
     <PackageReference Include="Lykke.Common" Version="1.1.100" />
     <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.0.13" />
     <PackageReference Include="Lykke.Logs" Version="3.1.2" />

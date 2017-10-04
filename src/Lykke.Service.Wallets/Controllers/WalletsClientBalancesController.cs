@@ -1,8 +1,6 @@
 ﻿using Common.Log;
 using Lykke.Service.Wallets.Core.Wallets;
-using Lykke.Service.Wallets.Models;
 using Lykke.Service.Wallets.Models.ClientBalances;
-using Lykke.Service.Wallets.Strings;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
@@ -17,10 +15,10 @@ namespace Lykke.Service.Wallets.Controllers
     public class WalletsClientBalancesController : Controller
     {
         private readonly IWalletsRepository _walletsRepository;
-        
+
         public WalletsClientBalancesController(IWalletsRepository walletsRepository)
         {
-            _walletsRepository = walletsRepository;            
+            _walletsRepository = walletsRepository;
         }
 
         [HttpGet]
@@ -29,9 +27,9 @@ namespace Lykke.Service.Wallets.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [SwaggerOperation("GetClientBalances")]
         public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
-        {          
+        {
             var wallets = await _walletsRepository.GetAsync(clientId);
-                
+
             return wallets.Select(ClientBalanceResponseModel.Create);            
         }
 
