@@ -13,6 +13,12 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.Swagger.Model;
 using System;
 using System.Collections.Generic;
+using AzureStorage.Tables;
+using Common.Log;
+using Lykke.AzureQueueIntegration;
+using Lykke.Logs;
+using Lykke.Service.Wallets.Settings;
+using Lykke.SlackNotification.AzureQueue;
 
 namespace Lykke.Service.Wallets
 {
@@ -37,6 +43,8 @@ namespace Lykke.Service.Wallets
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            var appSettings = Configuration.LoadSettings<AppSettings>();
+
             services.AddMvc()
                 .AddJsonOptions(options =>
                 {
@@ -53,14 +61,12 @@ namespace Lykke.Service.Wallets
                 options.DescribeAllEnumsAsStrings();
             });
 
+            services.AddLoggingWithSlack("LykkeWalletsServiceLog", appSettings.CurrentValue.SlackNotifications.AzureQueue, appSettings.ConnectionString(x => x.WalletsServiceSettings.Db.LogsConnString));
+
             var builder = new ContainerBuilder();
-
-            AppSettings appSettings = Environment.IsDevelopment()
-                ? Configuration.Get<AppSettings>()
-                : SettingsProcessor.Process<AppSettings>(Configuration["SettingsUrl"].GetStringAsync().Result);
-
-            builder.RegisterModule(new ServiceModule(appSettings.WalletsServiceSettings));
             builder.Populate(services);
+
+            builder.RegisterModule(new ServiceModule(appSettings.Nested(s => s.WalletsServiceSettings)));            
 
             ApplicationContainer = builder.Build();
             return new AutofacServiceProvider(ApplicationContainer);
@@ -72,7 +78,7 @@ namespace Lykke.Service.Wallets
             {
                 app.UseDeveloperExceptionPage();
             }
-
+           
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUi();
@@ -86,6 +92,47 @@ namespace Lykke.Service.Wallets
 
                 ApplicationContainer.Dispose();
             });
+        }
+    }
+
+    public static class ServiceCollectionExtensions
+    {
+        public static void AddLoggingWithSlack(this IServiceCollection services, string appName, AzureQueueSettings azureQueueSettings, IReloadingManager<string> dbLogConnectionStringManager)
+        {
+            var consoleLogger = new LogToConsole();
+            var aggregateLogger = new AggregateLogger();
+
+            aggregateLogger.AddLog(consoleLogger);
+
+            // Creating slack notification service, which logs own azure queue processing messages to aggregate log
+            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
+            {
+                ConnectionString = azureQueueSettings.ConnectionString,
+                QueueName = azureQueueSettings.QueueName
+            }, aggregateLogger);
+
+            var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
+
+            // Creating azure storage logger, which logs own messages to concole log
+            if (!string.IsNullOrEmpty(dbLogConnectionString) && !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
+            {
+                var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
+                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, appName, consoleLogger),
+                    consoleLogger);
+
+                var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
+
+                var azureStorageLogger = new LykkeLogToAzureStorage(
+                    persistenceManager,
+                    slackNotificationsManager,
+                    consoleLogger);
+                
+                azureStorageLogger.Start();
+
+                aggregateLogger.AddLog(azureStorageLogger);
+            }
+            
+            services.AddSingleton<ILog>(aggregateLogger);
         }
     }
 }

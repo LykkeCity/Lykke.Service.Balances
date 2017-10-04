@@ -8,6 +8,7 @@ using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Lykke.Service.Wallets.Controllers
@@ -16,55 +17,37 @@ namespace Lykke.Service.Wallets.Controllers
     public class WalletsClientBalancesController : Controller
     {
         private readonly IWalletsRepository _walletsRepository;
-        private readonly ILog _log;
-
-        public WalletsClientBalancesController(IWalletsRepository walletsRepository, ILog log)
+        
+        public WalletsClientBalancesController(IWalletsRepository walletsRepository)
         {
-            _walletsRepository = walletsRepository;
-            _log = log;
+            _walletsRepository = walletsRepository;            
         }
 
         [HttpGet]
         [Route("getClientBalances/{clientId}")]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [SwaggerOperation("GetClientBalances")]
         public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
-        {
-            try
-            {
-                var wallets = (await _walletsRepository.GetAsync(clientId)).ToArray();
-                if (wallets == null || wallets.Count() == 0)
-                {
-                    return null;
-                }
-                return wallets.Select(ClientBalanceResponseModel.Create);
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController), nameof(GetClientBalances), $"clientId = {clientId}", ex);
-                return null;
-            }
+        {          
+            var wallets = await _walletsRepository.GetAsync(clientId);
+                
+            return wallets.Select(ClientBalanceResponseModel.Create);            
         }
 
         [HttpGet]
         [Route("getClientBalancesByAssetId")]
+        [ProducesResponseType(typeof(ClientBalanceResponseModel),(int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [SwaggerOperation("GetClientBalancesByAssetId")]
-        public async Task<ClientBalanceResponseModel> GetClientBalancesByAssetId([FromBody]ClientBalanceByAssetIdModel model)
+        public async Task<IActionResult> GetClientBalancesByAssetId([FromBody]ClientBalanceByAssetIdModel model)
         {
-            try
-            {
-                var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
-                if (wallet != null)
-                {
-                    return ClientBalanceResponseModel.Create(wallet);
-                }
+            var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
 
-                return ClientBalanceResponseModel.NoResultFound();
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController), nameof(GetClientBalancesByAssetId), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
-                return ClientBalanceResponseModel.CreateErrorMessage(ex.Message);
-            }
+            if (wallet == null)
+                return NotFound();
+
+            return Ok(ClientBalanceResponseModel.Create(wallet));                
         }
     }
 }

@@ -1,20 +1,19 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.Logs;
 using Lykke.Service.Wallets.AzureRepositories;
-using Lykke.Service.Wallets.Core;
+using Lykke.Service.Wallets.AzureRepositories.Account;
 using Lykke.Service.Wallets.Core.Wallets;
-using Microsoft.Extensions.PlatformAbstractions;
+using Lykke.Service.Wallets.Settings;
+using Lykke.SettingsReader;
 
 namespace Lykke.Service.Wallets.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly WalletsSettings _settings;
-        const string appName = "Lykke.Service.Wallets";
-
-        public ServiceModule(WalletsSettings settings)
+        private readonly IReloadingManager<WalletsSettings> _settings;
+        
+        public ServiceModule(IReloadingManager<WalletsSettings> settings)
         {
             _settings = settings;
         }
@@ -23,25 +22,9 @@ namespace Lykke.Service.Wallets.Modules
         {
             builder.RegisterInstance(_settings)
                 .SingleInstance();
-
-
-            var consoleLogger = new LogToConsole();
-            var aggregateLogger = new AggregateLogger();
-
-
-
-            var log = new LykkeLogToAzureStorage(PlatformServices.Default.Application.ApplicationName,
-                                     new LykkeLogToAzureStoragePersistenceManager(nameof(Wallets),
-                                     AzureTableStorage<LogEntity>.Create(() => _settings.Db.LogsConnString, "LykkeWalletsServiceLog", null)));
-
-
-            builder.RegisterInstance(log)
-                .As<ILog>()
-                .SingleInstance();
-
-            builder.RegisterInstance<IWalletsRepository>(
-              AzureRepoFactories.CreateWalletsRepository(_settings.Db.ClientPersonalInfoConnString, log)
-          ).SingleInstance();
+            
+            builder.RegisterType<WalletsRepository>().As<IWalletsRepository>().SingleInstance();
+            builder.Register(kernel => AzureTableStorage<WalletEntity>.Create(_settings.ConnectionString(x => x.Db.ClientPersonalInfoConnString), "Accounts", kernel.Resolve<ILog>())).SingleInstance();
         }
     }
 }

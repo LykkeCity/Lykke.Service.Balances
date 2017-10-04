@@ -1,8 +1,9 @@
-﻿namespace Lykke.Service.Wallets.Core
+﻿namespace Lykke.Service.Wallets.Settings
 {
     public class AppSettings
     {
         public WalletsSettings WalletsServiceSettings { get; set; }
+        public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 
     public class WalletsSettings
