@@ -2,11 +2,11 @@
 {
     public class AppSettings
     {
-        public WalletsSettings WalletsServiceSettings { get; set; }
+        public BalancesSettings BalancesService { get; set; }
         public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 
-    public class WalletsSettings
+    public class BalancesSettings
     {
         public DbSettings Db { get; set; }
     }

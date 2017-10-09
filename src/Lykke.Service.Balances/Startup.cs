@@ -61,12 +61,12 @@ namespace Lykke.Service.Balances
                 options.DescribeAllEnumsAsStrings();
             });
 
-            services.AddLoggingWithSlack("LykkeWalletsServiceLog", appSettings.CurrentValue.SlackNotifications.AzureQueue, appSettings.ConnectionString(x => x.WalletsServiceSettings.Db.LogsConnString));
+            services.AddLoggingWithSlack("LykkeWalletsServiceLog", appSettings.CurrentValue.SlackNotifications.AzureQueue, appSettings.ConnectionString(x => x.BalancesService.Db.LogsConnString));
 
             var builder = new ContainerBuilder();
             builder.Populate(services);
 
-            builder.RegisterModule(new ServiceModule(appSettings.Nested(s => s.WalletsServiceSettings)));            
+            builder.RegisterModule(new ServiceModule(appSettings.Nested(s => s.BalancesService)));            
 
             ApplicationContainer = builder.Build();
             return new AutofacServiceProvider(ApplicationContainer);

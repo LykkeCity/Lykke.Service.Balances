@@ -12,9 +12,9 @@ namespace Lykke.Service.Balances.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<WalletsSettings> _settings;
+        private readonly IReloadingManager<BalancesSettings> _settings;
         
-        public ServiceModule(IReloadingManager<WalletsSettings> settings)
+        public ServiceModule(IReloadingManager<BalancesSettings> settings)
         {
             _settings = settings;
         }
