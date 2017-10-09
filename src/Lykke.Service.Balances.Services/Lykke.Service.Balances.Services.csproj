@@ -13,4 +13,8 @@
     <PackageReference Include="Lykke.Common" Version="1.1.97" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
+  </ItemGroup>
+
 </Project>

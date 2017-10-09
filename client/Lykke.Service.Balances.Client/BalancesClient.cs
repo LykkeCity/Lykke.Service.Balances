@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Lykke.Service.Balances.Client
 {
-    public class WalletsClient : IWalletsClient, IDisposable
+    public class BalancesClient : IBalancesClient, IDisposable
     {
         private readonly ILog _log;
         private WalletsService _service;
 
-        public WalletsClient(string serviceUrl, ILog log)
+        public BalancesClient(string serviceUrl, ILog log)
         {
             _service = new WalletsService(new Uri(serviceUrl));
             _log = log;
@@ -28,7 +28,7 @@ namespace Lykke.Service.Balances.Client
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetClientBalances), $"clientId = {clientId}", ex);
+                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetClientBalances), $"clientId = {clientId}", ex);
                 return null;
             }
         }
@@ -45,7 +45,7 @@ namespace Lykke.Service.Balances.Client
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetClientBalances), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
+                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetClientBalances), $"clientId = {model.ClientId}, assetId = {model.AssetId}", ex);
                 return ClientBalanceModel.Create(new ClientBalanceResponseModel() { ErrorMessage = ex.Message });
             }
         }
@@ -59,7 +59,7 @@ namespace Lykke.Service.Balances.Client
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
+                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
                 return new WalletCredentialsModel() { ErrorMessage = ex.Message };
             }
         }
@@ -73,7 +73,7 @@ namespace Lykke.Service.Balances.Client
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
+                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetWalletCredential), $"clientId = {clientId}", ex);
                 return new WalletCredentialsHistoryModel() { ErrorMessage = ex.Message };
             }
         }

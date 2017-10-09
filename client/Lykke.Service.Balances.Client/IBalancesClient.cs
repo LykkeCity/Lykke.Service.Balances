@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lykke.Service.Balances.Client
 {
-    public interface IWalletsClient
+    public interface IBalancesClient
     {
         Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId);
         Task<ClientBalanceModel> GetClientBalanceByAssetId(AutorestClient.Models.ClientBalanceByAssetIdModel model);

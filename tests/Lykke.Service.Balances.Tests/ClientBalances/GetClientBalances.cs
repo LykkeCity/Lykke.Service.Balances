@@ -13,7 +13,7 @@ namespace Lykke.Service.Balances.Tests.ClientBalances
         [Fact]
         public void GetClientBalancesByClientId()
         {
-            var client = new WalletsClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl, _log);
             var result = client.GetClientBalances("35302a53-cacb-4052-b5c0-57f9c819495b");
 
             Assert.NotNull(result);
@@ -22,7 +22,7 @@ namespace Lykke.Service.Balances.Tests.ClientBalances
         [Fact]
         public void GetClientBalancesByClientIdAndAssetId()
         {
-            var client = new WalletsClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl, _log);
             var result = client.GetClientBalanceByAssetId(new Client.AutorestClient.Models.ClientBalanceByAssetIdModel() { ClientId = "35302a53-cacb-4052-b5c0-57f9c819495b", AssetId = "USD" });
 
             Assert.NotNull(result);

@@ -1,8 +1,5 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Common;
-using Flurl.Http;
-using Lykke.Service.Balances.Core;
 using Lykke.Service.Balances.Modules;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
@@ -10,13 +7,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.Swagger.Model;
 using System;
-using System.Collections.Generic;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.AzureQueueIntegration;
+using Lykke.Common.ApiLibrary.Middleware;
+using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Settings;
 using Lykke.SlackNotification.AzureQueue;
 
@@ -26,12 +23,13 @@ namespace Lykke.Service.Balances
     {
         public IHostingEnvironment Environment { get; }
         public IContainer ApplicationContainer { get; set; }
+        public ILog Log { get; private set; }
 
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -43,61 +41,108 @@ namespace Lykke.Service.Balances
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var appSettings = Configuration.LoadSettings<AppSettings>();
-
-            services.AddMvc()
-                .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-                });
-
-            services.AddSwaggerGen(options =>
+            try
             {
-                options.SingleApiVersion(new Info
+                services.AddMvc()
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                    });
+
+                services.AddSwaggerGen(options =>
                 {
-                    Version = "v1",
-                    Title = "Wallets Service"
+                    options.DefaultLykkeConfiguration("v1", "Balances API");
                 });
-                options.DescribeAllEnumsAsStrings();
-            });
 
-            services.AddLoggingWithSlack("LykkeWalletsServiceLog", appSettings.CurrentValue.SlackNotifications.AzureQueue, appSettings.ConnectionString(x => x.BalancesService.Db.LogsConnString));
+                var builder = new ContainerBuilder();
+                var appSettings = Configuration.LoadSettings<AppSettings>();
+                Log = CreateLogWithSlack(services, appSettings);
+                builder.RegisterModule(new ServiceModule(appSettings.Nested(s => s.BalancesService), Log));
+                builder.Populate(services);
+                ApplicationContainer = builder.Build();
 
-            var builder = new ContainerBuilder();
-            builder.Populate(services);
-
-            builder.RegisterModule(new ServiceModule(appSettings.Nested(s => s.BalancesService)));            
-
-            ApplicationContainer = builder.Build();
-            return new AutofacServiceProvider(ApplicationContainer);
+                return new AutofacServiceProvider(ApplicationContainer);
+            }
+            catch (Exception ex)
+            {
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(ConfigureServices), "", ex);
+                throw;
+            }
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime)
         {
-            if (env.IsDevelopment())
+            try
             {
-                app.UseDeveloperExceptionPage();
+                if (env.IsDevelopment())
+                {
+                    app.UseDeveloperExceptionPage();
+                }
+
+                app.UseLykkeMiddleware("Balances", ex => new { Message = "Technical problem" });
+
+                app.UseMvc();
+                app.UseSwagger();
+                app.UseSwaggerUi();
+                app.UseStaticFiles();
+
+                appLifetime.ApplicationStarted.Register(StartApplication);
+                appLifetime.ApplicationStopping.Register(StopApplication);
+                appLifetime.ApplicationStopped.Register(CleanUp);
             }
-           
-            app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUi();
-
-            appLifetime.ApplicationStopped.Register(() =>
+            catch (Exception ex)
             {
-                var stoppableSerivces = ApplicationContainer.Resolve<IEnumerable<IStopable>>();
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(ConfigureServices), "", ex);
+                throw;
+            }
+        }
 
-                foreach (var service in stoppableSerivces)
-                    service.Stop();
+        private void StartApplication()
+        {
+            try
+            {
+                // NOTE: Service not yet recieve and process requests here
+
+                ApplicationContainer.Resolve<IStartupManager>().StartAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(StartApplication), "", ex);
+                throw;
+            }
+        }
+
+        private void StopApplication()
+        {
+            try
+            {
+                // NOTE: Service still can recieve and process requests here, so take care about it if you add logic here.
+
+                ApplicationContainer.Resolve<IShutdownManager>().StopAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(StopApplication), "", ex);
+                throw;
+            }
+        }
+
+        private void CleanUp()
+        {
+            try
+            {
+                // NOTE: Service can't recieve and process requests here, so you can destroy all resources
 
                 ApplicationContainer.Dispose();
-            });
+            }
+            catch (Exception ex)
+            {
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(CleanUp), "", ex);
+                throw;
+            }
         }
-    }
 
-    public static class ServiceCollectionExtensions
-    {
-        public static void AddLoggingWithSlack(this IServiceCollection services, string appName, AzureQueueSettings azureQueueSettings, IReloadingManager<string> dbLogConnectionStringManager)
+        private static ILog CreateLogWithSlack(IServiceCollection services, IReloadingManager<AppSettings> settings)
         {
             var consoleLogger = new LogToConsole();
             var aggregateLogger = new AggregateLogger();
@@ -107,32 +152,37 @@ namespace Lykke.Service.Balances
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
             var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
             {
-                ConnectionString = azureQueueSettings.ConnectionString,
-                QueueName = azureQueueSettings.QueueName
+                ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
+                QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
             }, aggregateLogger);
 
+            var dbLogConnectionStringManager = settings.Nested(x => x.BalancesService.Db.LogsConnString);
             var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
 
             // Creating azure storage logger, which logs own messages to concole log
             if (!string.IsNullOrEmpty(dbLogConnectionString) && !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
             {
+                const string appName = "Lykke.Service.Balances";
+
                 var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, appName, consoleLogger),
+                    appName,
+                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "PushNotificationsLog", consoleLogger),
                     consoleLogger);
 
-                var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
+                var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(appName, slackService, consoleLogger);
 
                 var azureStorageLogger = new LykkeLogToAzureStorage(
+                    appName,
                     persistenceManager,
                     slackNotificationsManager,
                     consoleLogger);
-                
+
                 azureStorageLogger.Start();
 
                 aggregateLogger.AddLog(azureStorageLogger);
             }
-            
-            services.AddSingleton<ILog>(aggregateLogger);
+
+            return aggregateLogger;
         }
     }
 }

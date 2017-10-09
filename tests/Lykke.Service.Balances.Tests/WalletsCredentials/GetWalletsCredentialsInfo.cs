@@ -13,7 +13,7 @@ namespace Lykke.Service.Balances.Tests.WalletsCredentials
         [Fact(Skip = "integration test")]
         public async void GetWalletCredentialByClientId()
         {
-            var client = new WalletsClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl, _log);
             var result = await (client.GetWalletCredential("35302a53-cacb-4052-b5c0-57f9c819495b"));
 
             Assert.NotNull(result);
@@ -23,7 +23,7 @@ namespace Lykke.Service.Balances.Tests.WalletsCredentials
         [Fact(Skip = "integration test")]
         public async void GetWalletCredentialHistoryByClientIdAndAssetId()
         {
-            var client = new WalletsClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl, _log);
             var result = await (client.GetWalletCredentialHistory("35302a53-cacb-4052-b5c0-57f9c819495b"));
 
             Assert.NotNull(result);
