@@ -2,14 +2,14 @@
 {
     public interface IWalletCredentials
     {
-        string ClientId { get; }
-        string Address { get; }
-        string PublicKey { get; }
-        string PrivateKey { get; }
-        string MultiSig { get; }
-        string ColoredMultiSig { get; }
-        bool PreventTxDetection { get; }
-        string EncodedPrivateKey { get; }
+        string ClientId { get; set; }
+        string Address { get; set; }
+        string PublicKey { get; set; }
+        string PrivateKey { get; set; }
+        string MultiSig { get; set; }
+        string ColoredMultiSig { get; set; }
+        bool PreventTxDetection { get; set; }
+        string EncodedPrivateKey { get; set; }
 
         /// <summary>
         /// Conversion wallet is used for accepting BTC deposit and transfering needed LKK amount

@@ -1,4 +1,4 @@
-﻿using Lykke.Service.Balances.Client.AutorestClient.Models;
+﻿using Lykke.Service.Balances.AutorestClient.Models;
 
 namespace Lykke.Service.Balances.Client.ResponseModels
 {

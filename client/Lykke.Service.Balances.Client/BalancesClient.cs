@@ -1,22 +1,22 @@
 ﻿using Common.Log;
-using Lykke.Service.Balances.Client.AutorestClient;
-using Lykke.Service.Balances.Client.AutorestClient.Models;
 using Lykke.Service.Balances.Client.Models;
 using Lykke.Service.Balances.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.Balances.AutorestClient;
+using Lykke.Service.Balances.AutorestClient.Models;
 
 namespace Lykke.Service.Balances.Client
 {
     public class BalancesClient : IBalancesClient, IDisposable
     {
         private readonly ILog _log;
-        private WalletsService _service;
+        private IBalancesAPI _service;
 
         public BalancesClient(string serviceUrl, ILog log)
         {
-            _service = new WalletsService(new Uri(serviceUrl));
+            _service = new BalancesAPI(new Uri(serviceUrl));
             _log = log;
         }
 

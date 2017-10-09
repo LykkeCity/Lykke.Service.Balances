@@ -1,8 +1,8 @@
-using Lykke.Service.Balances.Client.AutorestClient.Models;
 using Lykke.Service.Balances.Client.Models;
 using Lykke.Service.Balances.Client.ResponseModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lykke.Service.Balances.AutorestClient.Models;
 
 namespace Lykke.Service.Balances.Client
 {

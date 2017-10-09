@@ -1,4 +1,5 @@
 ﻿using Common.Log;
+using Lykke.Service.Balances.AutorestClient.Models;
 using Lykke.Service.Balances.Client;
 using Xunit;
 
@@ -23,7 +24,7 @@ namespace Lykke.Service.Balances.Tests.ClientBalances
         public void GetClientBalancesByClientIdAndAssetId()
         {
             var client = new BalancesClient(ServiceUrl, _log);
-            var result = client.GetClientBalanceByAssetId(new Client.AutorestClient.Models.ClientBalanceByAssetIdModel() { ClientId = "35302a53-cacb-4052-b5c0-57f9c819495b", AssetId = "USD" });
+            var result = client.GetClientBalanceByAssetId( new ClientBalanceByAssetIdModel { ClientId = "35302a53-cacb-4052-b5c0-57f9c819495b", AssetId = "USD" });
 
             Assert.NotNull(result);
         }
