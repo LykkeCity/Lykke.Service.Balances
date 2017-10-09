@@ -1,7 +1,7 @@
-﻿using Lykke.Service.Wallets.Core.Wallets;
+﻿using Lykke.Service.Balances.Core.Wallets;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Lykke.Service.Wallets.AzureRepositories.Wallets
+namespace Lykke.Service.Balances.AzureRepositories.Wallets
 {
     public class WalletCredentialsHistoryRecord : TableEntity, IWalletCredentials
     {

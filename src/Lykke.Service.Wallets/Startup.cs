@@ -2,8 +2,8 @@
 using Autofac.Extensions.DependencyInjection;
 using Common;
 using Flurl.Http;
-using Lykke.Service.Wallets.Core;
-using Lykke.Service.Wallets.Modules;
+using Lykke.Service.Balances.Core;
+using Lykke.Service.Balances.Modules;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,10 +17,10 @@ using AzureStorage.Tables;
 using Common.Log;
 using Lykke.AzureQueueIntegration;
 using Lykke.Logs;
-using Lykke.Service.Wallets.Settings;
+using Lykke.Service.Balances.Settings;
 using Lykke.SlackNotification.AzureQueue;
 
-namespace Lykke.Service.Wallets
+namespace Lykke.Service.Balances
 {
     public class Startup
     {

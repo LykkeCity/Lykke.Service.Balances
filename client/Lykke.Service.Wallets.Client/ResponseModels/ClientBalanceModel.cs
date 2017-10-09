@@ -1,6 +1,6 @@
-﻿using Lykke.Service.Wallets.Client.AutorestClient.Models;
+﻿using Lykke.Service.Balances.Client.AutorestClient.Models;
 
-namespace Lykke.Service.Wallets.Client.ResponseModels
+namespace Lykke.Service.Balances.Client.ResponseModels
 {
     public class ClientBalanceModel
     {

@@ -1,1 +1,1 @@
-# Lykke.Service.Wallets
+# Lykke.Service.Balances

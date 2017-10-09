@@ -1,12 +1,12 @@
 ﻿using Common.Log;
-using Lykke.Service.Wallets.Core.Wallets;
+using Lykke.Service.Balances.Core.Wallets;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lykke.Service.Wallets.Controllers
+namespace Lykke.Service.Balances.Controllers
 {
     [Route("api/[controller]")]
     public class WalletCredentialsHistoryController : Controller

@@ -1,7 +1,7 @@
 ﻿
-using Lykke.Service.Wallets.Strings;
+using Lykke.Service.Balances.Strings;
 
-namespace Lykke.Service.Wallets.Models.ClientBalances
+namespace Lykke.Service.Balances.Models.ClientBalances
 {
     public class ClientBalanceResponseModel
     {

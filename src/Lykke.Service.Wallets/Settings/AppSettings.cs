@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.Wallets.Settings
+﻿namespace Lykke.Service.Balances.Settings
 {
     public class AppSettings
     {

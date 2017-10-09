@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lykke.Service.Wallets.Models.ClientBalances
+namespace Lykke.Service.Balances.Models.ClientBalances
 {
     public class ClientBalanceByAssetIdModel
     {

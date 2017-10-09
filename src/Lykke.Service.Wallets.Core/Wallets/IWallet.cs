@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.Wallets.Core.Wallets
+﻿namespace Lykke.Service.Balances.Core.Wallets
 {
     public interface IWallet
     {

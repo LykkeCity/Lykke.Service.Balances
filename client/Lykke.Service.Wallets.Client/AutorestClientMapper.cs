@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.Wallets.Client
+﻿namespace Lykke.Service.Balances.Client
 {
     public static class AutorestClientMapper
     {

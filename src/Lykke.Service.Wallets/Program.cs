@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using System.IO;
 
-namespace Lykke.Service.Wallets
+namespace Lykke.Service.Balances
 {
     public class Program
     {

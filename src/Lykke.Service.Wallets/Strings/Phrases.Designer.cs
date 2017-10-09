@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Lykke.Service.Wallets.Strings {
+namespace Lykke.Service.Balances.Strings {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Lykke.Service.Wallets.Strings {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lykke.Service.Wallets.Strings.Phrases", typeof(Phrases).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lykke.Service.Balances.Strings.Phrases", typeof(Phrases).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

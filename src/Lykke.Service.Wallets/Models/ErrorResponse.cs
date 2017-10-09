@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Lykke.Service.Wallets.Models
+namespace Lykke.Service.Balances.Models
 {
     public class ErrorResponse
     {

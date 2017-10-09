@@ -1,10 +1,10 @@
-﻿using Lykke.Service.Wallets.Models;
+﻿using Lykke.Service.Balances.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Net;
 
-namespace Lykke.Service.Wallets.Controllers
+namespace Lykke.Service.Balances.Controllers
 {
     [Route("api/[controller]")]
     public class IsAliveController : Controller

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>Lykke.Service.Wallets.AzureRepositories</AssemblyName>
-    <RootNamespace>Lykke.Service.Wallets.AzureRepositories</RootNamespace>
+    <AssemblyName>Lykke.Service.Balances.AzureRepositories</AssemblyName>
+    <RootNamespace>Lykke.Service.Balances.AzureRepositories</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
 
@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lykke.Service.Wallets.Core\Lykke.Service.Wallets.Core.csproj" />
+    <ProjectReference Include="..\Lykke.Service.Balances.Core\Lykke.Service.Balances.Core.csproj" />
   </ItemGroup>
 
 </Project>

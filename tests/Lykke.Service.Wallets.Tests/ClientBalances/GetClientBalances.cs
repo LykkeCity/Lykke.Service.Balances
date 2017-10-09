@@ -1,8 +1,8 @@
 ﻿using Common.Log;
-using Lykke.Service.Wallets.Client;
+using Lykke.Service.Balances.Client;
 using Xunit;
 
-namespace Lykke.Service.Wallets.Tests.ClientBalances
+namespace Lykke.Service.Balances.Tests.ClientBalances
 {
     public class GetClientBalances
     {

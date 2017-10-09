@@ -5,12 +5,12 @@
     <Version>1.0.1</Version>
     <Authors>Lykke</Authors>
     <Company>Lykke</Company>
-    <Product>Lykke.Service.Wallets</Product>
-    <Description>Client for Lykke.Service.Wallets API</Description>
-    <PackageLicenseUrl>https://github.com/LykkeCity/Lykke.Service.Wallets/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/LykkeCity/Lykke.Service.Wallets</PackageProjectUrl>
+    <Product>Lykke.Service.Balances</Product>
+    <Description>Client for Lykke.Service.Balances API</Description>
+    <PackageLicenseUrl>https://github.com/LykkeCity/Lykke.Service.Balances/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/LykkeCity/Lykke.Service.Balances</PackageProjectUrl>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/14153330?v=3&amp;s=200</PackageIconUrl>
-    <RepositoryUrl>https://github.com/LykkeCity/Lykke.Service.Wallets.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/LykkeCity/Lykke.Service.Balances.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Lykke</PackageTags>
   </PropertyGroup>

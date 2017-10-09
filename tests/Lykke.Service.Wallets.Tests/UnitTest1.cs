@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Lykke.Service.Wallets.Tests
+namespace Lykke.Service.Balances.Tests
 {
     public class UnitTest1
     {

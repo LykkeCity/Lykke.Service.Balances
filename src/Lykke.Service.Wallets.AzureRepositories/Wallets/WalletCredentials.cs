@@ -1,6 +1,6 @@
-﻿using Lykke.Service.Wallets.Core.Wallets;
+﻿using Lykke.Service.Balances.Core.Wallets;
 
-namespace Lykke.Service.Wallets.AzureRepositories.Wallets
+namespace Lykke.Service.Balances.AzureRepositories.Wallets
 {
     public class WalletCredentials : IWalletCredentials
     {

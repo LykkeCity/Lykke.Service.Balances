@@ -1,14 +1,14 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Common.Log;
-using Lykke.Service.Wallets.AzureRepositories;
-using Lykke.Service.Wallets.AzureRepositories.Account;
-using Lykke.Service.Wallets.AzureRepositories.Wallets;
-using Lykke.Service.Wallets.Core.Wallets;
-using Lykke.Service.Wallets.Settings;
+using Lykke.Service.Balances.AzureRepositories;
+using Lykke.Service.Balances.AzureRepositories.Account;
+using Lykke.Service.Balances.AzureRepositories.Wallets;
+using Lykke.Service.Balances.Core.Wallets;
+using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
 
-namespace Lykke.Service.Wallets.Modules
+namespace Lykke.Service.Balances.Modules
 {
     public class ServiceModule : Module
     {

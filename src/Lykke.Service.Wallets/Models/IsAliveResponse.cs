@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lykke.Service.Wallets.Models
+namespace Lykke.Service.Balances.Models
 {
     public class IsAliveResponse
     {

@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.Wallets.Client.Models
+﻿namespace Lykke.Service.Balances.Client.Models
 {
     public class ClientBalanceByAssetIdModel
     {

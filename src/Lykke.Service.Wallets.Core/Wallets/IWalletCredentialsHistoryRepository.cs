@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lykke.Service.Wallets.Core.Wallets
+namespace Lykke.Service.Balances.Core.Wallets
 {
     public interface IWalletCredentialsHistoryRepository
     {

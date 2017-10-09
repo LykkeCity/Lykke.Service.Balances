@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>Lykke.Service.Wallets.Core</AssemblyName>
-    <RootNamespace>Lykke.Service.Wallets.Core</RootNamespace>
+    <AssemblyName>Lykke.Service.Balances.Core</AssemblyName>
+    <RootNamespace>Lykke.Service.Balances.Core</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
 

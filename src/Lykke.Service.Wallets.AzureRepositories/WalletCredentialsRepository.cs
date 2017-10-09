@@ -1,12 +1,12 @@
 ﻿using AzureStorage;
-using Lykke.Service.Wallets.AzureRepositories.Wallets;
-using Lykke.Service.Wallets.Core.Wallets;
+using Lykke.Service.Balances.AzureRepositories.Wallets;
+using Lykke.Service.Balances.Core.Wallets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lykke.Service.Wallets.AzureRepositories
+namespace Lykke.Service.Balances.AzureRepositories
 {
     public class WalletCredentialsRepository : IWalletCredentialsRepository
     {

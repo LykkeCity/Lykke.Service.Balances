@@ -1,13 +1,13 @@
 ﻿using Common.Log;
-using Lykke.Service.Wallets.Client.AutorestClient;
-using Lykke.Service.Wallets.Client.AutorestClient.Models;
-using Lykke.Service.Wallets.Client.Models;
-using Lykke.Service.Wallets.Client.ResponseModels;
+using Lykke.Service.Balances.Client.AutorestClient;
+using Lykke.Service.Balances.Client.AutorestClient.Models;
+using Lykke.Service.Balances.Client.Models;
+using Lykke.Service.Balances.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lykke.Service.Wallets.Client
+namespace Lykke.Service.Balances.Client
 {
     public class WalletsClient : IWalletsClient, IDisposable
     {

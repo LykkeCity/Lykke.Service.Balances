@@ -2,12 +2,12 @@
 // Changes may cause incorrect behavior and will be lost if the code is
 // regenerated.
 
-namespace Lykke.Service.Wallets.Client.AutorestClient.Models
+namespace Lykke.Service.Balances.Client.AutorestClient.Models
 {
     using Lykke.Service;
-    using Lykke.Service.Wallets;
-    using Lykke.Service.Wallets.Client;
-    using Lykke.Service.Wallets.Client.AutorestClient;
+    using Lykke.Service.Balances;
+    using Lykke.Service.Balances.Client;
+    using Lykke.Service.Balances.Client.AutorestClient;
     using Newtonsoft.Json;
     using System.Linq;
 
