@@ -53,8 +53,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.AzureRepositories\Lykke.Service.Balances.AzureRepositories.csproj" />
-    <ProjectReference Include="..\Lykke.Service.Balances.Core\Lykke.Service.Balances.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.Services\Lykke.Service.Balances.Services.csproj" />
   </ItemGroup>
   

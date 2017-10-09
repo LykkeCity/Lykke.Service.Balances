@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lykke.Service.Balances.Core\Lykke.Service.Balances.Core.csproj" />
+    <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
   </ItemGroup>
 
 </Project>
