@@ -8,9 +8,20 @@ namespace Lykke.Service.Balances.Models
 {
     public class ErrorResponse
     {
-        public Dictionary<string, List<string>> ErrorMessages { get; } = new Dictionary<string, List<string>>();
+        public string ErrorMessage { get; }
 
         public Dictionary<string, List<string>> ModelErrors { get; }
+
+        private ErrorResponse() :
+            this(null)
+        {
+        }
+
+        private ErrorResponse(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+            ModelErrors = new Dictionary<string, List<string>>();
+        }
 
         public ErrorResponse AddModelError(string key, string message)
         {
@@ -51,15 +62,6 @@ namespace Lykke.Service.Balances.Models
             return new ErrorResponse();
         }
 
-        public static ErrorResponse Create(string field, string message)
-        {
-            var response = new ErrorResponse();
-
-            response.ErrorMessages.Add(field, new List<string> { message });
-
-            return response;
-        }
-
         public static ErrorResponse Create(ModelStateDictionary modelState)
         {
             var response = new ErrorResponse();
@@ -78,6 +80,11 @@ namespace Lykke.Service.Balances.Models
             }
 
             return response;
+        }
+
+        public static ErrorResponse Create(string message)
+        {
+            return new ErrorResponse(message);
         }
     }
 }

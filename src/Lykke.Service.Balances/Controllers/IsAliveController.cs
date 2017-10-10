@@ -16,15 +16,25 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [SwaggerOperation("IsAlive")]
         [ProducesResponseType(typeof(IsAliveResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public IsAliveResponse Get()
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public IActionResult Get()
         {
-            return new IsAliveResponse
+            try
             {
-                Version =
-                    Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion,
-                Env = Environment.GetEnvironmentVariable("Env")
-            };
+                var isAliveResponse = new IsAliveResponse
+                {
+                    Version =
+                        Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application
+                            .ApplicationVersion,
+                    Env = Environment.GetEnvironmentVariable("Env")
+                };
+
+                return Ok(isAliveResponse);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(ErrorResponse.Create(e.Message));
+            }
         }
     }
 }

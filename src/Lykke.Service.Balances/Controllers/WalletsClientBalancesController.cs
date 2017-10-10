@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common;
+using Lykke.Service.Balances.Models;
 
 namespace Lykke.Service.Balances.Controllers
 {
@@ -15,37 +17,63 @@ namespace Lykke.Service.Balances.Controllers
     public class WalletsClientBalancesController : Controller
     {
         private readonly IWalletsRepository _walletsRepository;
+        private readonly ILog _log;
 
-        public WalletsClientBalancesController(IWalletsRepository walletsRepository)
+        public WalletsClientBalancesController(IWalletsRepository walletsRepository, ILog log)
         {
             _walletsRepository = walletsRepository;
+            _log = log;
         }
 
         [HttpGet]
         [Route("getClientBalances/{clientId}")]
         [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [SwaggerOperation("GetClientBalances")]
-        public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
+        public async Task<IActionResult> GetClientBalances(string clientId)
         {
-            var wallets = await _walletsRepository.GetAsync(clientId);
+            try
+            {
+                var wallets = (await _walletsRepository.GetAsync(clientId)).ToList();
 
-            return wallets.Select(ClientBalanceResponseModel.Create);            
+                if (!wallets.Any()) return NotFound();
+
+                return Ok(wallets.Select(ClientBalanceResponseModel.Create));
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
+                    nameof(GetClientBalances), $"clientId = {clientId}", ex);
+
+                return BadRequest(ErrorResponse.Create(ex.Message));
+            }
         }
 
         [HttpGet]
         [Route("getClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel),(int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [SwaggerOperation("GetClientBalancesByAssetId")]
         public async Task<IActionResult> GetClientBalancesByAssetId([FromBody]ClientBalanceByAssetIdModel model)
         {
-            var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
+            try
+            {
+                var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
 
-            if (wallet == null)
-                return NotFound();
+                if (wallet == null)
+                    return NotFound();
 
-            return Ok(ClientBalanceResponseModel.Create(wallet));                
+                return Ok(ClientBalanceResponseModel.Create(wallet));
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
+                    nameof(GetClientBalancesByAssetId), $"model = {model.ToJson()}", ex);
+
+                return BadRequest(ErrorResponse.Create(ex.Message));
+            }
         }
     }
 }

@@ -101,8 +101,6 @@ namespace Lykke.Service.Balances
         {
             try
             {
-                // NOTE: Service not yet recieve and process requests here
-
                 ApplicationContainer.Resolve<IStartupManager>().StartAsync().Wait();
             }
             catch (Exception ex)
@@ -116,8 +114,6 @@ namespace Lykke.Service.Balances
         {
             try
             {
-                // NOTE: Service still can recieve and process requests here, so take care about it if you add logic here.
-
                 ApplicationContainer.Resolve<IShutdownManager>().StopAsync().Wait();
             }
             catch (Exception ex)
@@ -131,8 +127,6 @@ namespace Lykke.Service.Balances
         {
             try
             {
-                // NOTE: Service can't recieve and process requests here, so you can destroy all resources
-
                 ApplicationContainer.Dispose();
             }
             catch (Exception ex)

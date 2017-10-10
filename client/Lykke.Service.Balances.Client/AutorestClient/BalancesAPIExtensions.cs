@@ -7,8 +7,6 @@
 namespace Lykke.Service.Balances.AutorestClient
 {
     using Models;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -50,7 +48,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// </param>
             /// <param name='clientId'>
             /// </param>
-            public static IWalletCredentials GetWalletsCredentials(this IBalancesAPI operations, string clientId)
+            public static object GetWalletsCredentials(this IBalancesAPI operations, string clientId)
             {
                 return operations.GetWalletsCredentialsAsync(clientId).GetAwaiter().GetResult();
             }
@@ -63,7 +61,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IWalletCredentials> GetWalletsCredentialsAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetWalletsCredentialsAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetWalletsCredentialsWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -76,7 +74,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// </param>
             /// <param name='clientId'>
             /// </param>
-            public static IList<string> GetWalletsCredentialsHistory(this IBalancesAPI operations, string clientId)
+            public static object GetWalletsCredentialsHistory(this IBalancesAPI operations, string clientId)
             {
                 return operations.GetWalletsCredentialsHistoryAsync(clientId).GetAwaiter().GetResult();
             }
@@ -89,7 +87,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<string>> GetWalletsCredentialsHistoryAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetWalletsCredentialsHistoryAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetWalletsCredentialsHistoryWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -102,7 +100,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// </param>
             /// <param name='clientId'>
             /// </param>
-            public static IList<ClientBalanceResponseModel> GetClientBalances(this IBalancesAPI operations, string clientId)
+            public static object GetClientBalances(this IBalancesAPI operations, string clientId)
             {
                 return operations.GetClientBalancesAsync(clientId).GetAwaiter().GetResult();
             }
@@ -115,7 +113,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ClientBalanceResponseModel>> GetClientBalancesAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetClientBalancesAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetClientBalancesWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -128,7 +126,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// </param>
             /// <param name='model'>
             /// </param>
-            public static ClientBalanceResponseModel GetClientBalancesByAssetId(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel))
+            public static object GetClientBalancesByAssetId(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel))
             {
                 return operations.GetClientBalancesByAssetIdAsync(model).GetAwaiter().GetResult();
             }
@@ -141,7 +139,7 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ClientBalanceResponseModel> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {

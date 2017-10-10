@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.Balances.Models;
 
 namespace Lykke.Service.Balances.Controllers
 {
@@ -26,18 +28,22 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("getWalletsCredentialsHistory/{clientId}")]
         [SwaggerOperation("GetWalletsCredentialsHistory")]
-        public async Task<IEnumerable<string>> GetWalletsCredentialsHistory(string clientId)
+        [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetWalletsCredentialsHistory(string clientId)
         {
             try
             {
                 var walletCredentialsHistory = await _walletCredentialsHistoryRepository.GetPrevMultisigsForUser(clientId);
-                return walletCredentialsHistory;
+
+                return Ok(walletCredentialsHistory);
             }
             catch (Exception ex)
             {
                 await _log.WriteErrorAsync(nameof(WalletCredentialsHistoryController),
                     nameof(GetWalletsCredentialsHistory), $"clientId = {clientId}", ex);
-                return null;
+
+                return BadRequest(ErrorResponse.Create(ex.Message));
             }
         }
     }
