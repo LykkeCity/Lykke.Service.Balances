@@ -726,7 +726,9 @@ namespace Lykke.Service.Balances.AutorestClient
             return _result;
         }
 
-        /// <param name='model'>
+        /// <param name='assetId'>
+        /// </param>
+        /// <param name='clientId'>
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -740,11 +742,21 @@ namespace Lykke.Service.Balances.AutorestClient
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<object>> GetClientBalancesByAssetIdWithHttpMessagesAsync(ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<object>> GetClientBalancesByAssetIdWithHttpMessagesAsync(string assetId, string clientId = default(string), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (assetId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "assetId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -752,17 +764,28 @@ namespace Lykke.Service.Balances.AutorestClient
             {
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("model", model);
+                tracingParameters.Add("assetId", assetId);
+                tracingParameters.Add("clientId", clientId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "GetClientBalancesByAssetId", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/getClientBalancesByAssetId").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/getClientBalancesByAssetId/{assetId}").ToString();
+            _url = _url.Replace("{assetId}", System.Uri.EscapeDataString(assetId));
+            List<string> _queryParameters = new List<string>();
+            if (clientId != null)
+            {
+                _queryParameters.Add(string.Format("clientId={0}", System.Uri.EscapeDataString(clientId)));
+            }
+            if (_queryParameters.Count > 0)
+            {
+                _url += "?" + string.Join("&", _queryParameters);
+            }
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
-            _httpRequest.Method = new HttpMethod("POST");
+            _httpRequest.Method = new HttpMethod("GET");
             _httpRequest.RequestUri = new System.Uri(_url);
             // Set Headers
 
@@ -781,12 +804,6 @@ namespace Lykke.Service.Balances.AutorestClient
 
             // Serialize Request
             string _requestContent = null;
-            if(model != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(model, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
             // Send Request
             if (_shouldTrace)
             {
@@ -801,7 +818,7 @@ namespace Lykke.Service.Balances.AutorestClient
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 404 && (int)_statusCode != 500)
+            if ((int)_statusCode != 200 && (int)_statusCode != 404 && (int)_statusCode != 500 && (int)_statusCode != 400)
             {
                 var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 if (_httpResponse.Content != null) {
@@ -847,6 +864,24 @@ namespace Lykke.Service.Balances.AutorestClient
             }
             // Deserialize Response
             if ((int)_statusCode == 500)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ErrorResponse>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
+            // Deserialize Response
+            if ((int)_statusCode == 400)
             {
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try

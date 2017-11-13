@@ -52,17 +52,23 @@ namespace Lykke.Service.Balances.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("getClientBalancesByAssetId")]
+        [HttpGet]
+        [Route("getClientBalancesByAssetId/{assetId}")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetClientBalancesByAssetId([FromBody] ClientBalanceByAssetIdModel model)
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetClientBalancesByAssetId(string assetId, [FromQuery] string clientId)
         {
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                return BadRequest(ErrorResponse.Create("ClientId can't be empty"));
+            }
+
             try
             {
-                var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
+                var wallet = await _walletsRepository.GetAsync(clientId, assetId);
 
                 if (wallet == null)
                     return NotFound();
@@ -72,9 +78,10 @@ namespace Lykke.Service.Balances.Controllers
             catch (Exception ex)
             {
                 await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
-                    nameof(GetClientBalancesByAssetId), $"model = {model.ToJson()}", ex);
+                    nameof(GetClientBalancesByAssetId), $"clientId = {clientId}, assetId = {assetId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting client balance by asset"));
+                return StatusCode((int) HttpStatusCode.InternalServerError,
+                    ErrorResponse.Create("Error occured while getting client balance by asset"));
             }
         }
     }
