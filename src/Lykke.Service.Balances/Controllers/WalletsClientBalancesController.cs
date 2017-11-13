@@ -52,7 +52,7 @@ namespace Lykke.Service.Balances.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("getClientBalancesByAssetId")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel), (int) HttpStatusCode.OK)]
