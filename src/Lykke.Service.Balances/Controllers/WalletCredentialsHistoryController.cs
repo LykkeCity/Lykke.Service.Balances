@@ -28,13 +28,14 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("getWalletsCredentialsHistory/{clientId}")]
         [SwaggerOperation("GetWalletsCredentialsHistory")]
-        [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<string>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetWalletsCredentialsHistory(string clientId)
         {
             try
             {
-                var walletCredentialsHistory = await _walletCredentialsHistoryRepository.GetPrevMultisigsForUser(clientId);
+                var walletCredentialsHistory =
+                    await _walletCredentialsHistoryRepository.GetPrevMultisigsForUser(clientId);
 
                 return Ok(walletCredentialsHistory);
             }
@@ -43,7 +44,7 @@ namespace Lykke.Service.Balances.Controllers
                 await _log.WriteErrorAsync(nameof(WalletCredentialsHistoryController),
                     nameof(GetWalletsCredentialsHistory), $"clientId = {clientId}", ex);
 
-                return BadRequest(ErrorResponse.Create(ex.Message));
+                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials history"));
             }
         }
     }

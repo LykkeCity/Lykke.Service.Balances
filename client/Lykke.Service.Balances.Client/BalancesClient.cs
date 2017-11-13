@@ -4,7 +4,6 @@ using Lykke.Service.Balances.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common;
 using Lykke.Service.Balances.AutorestClient;
 using Lykke.Service.Balances.AutorestClient.Models;
 
@@ -12,6 +11,8 @@ namespace Lykke.Service.Balances.Client
 {
     public class BalancesClient : IBalancesClient, IDisposable
     {
+        private const string UexpectedApiResponse = "Unexpected Balances API response";
+
         private readonly ILog _log;
         private IBalancesAPI _service;
 
@@ -23,93 +24,75 @@ namespace Lykke.Service.Balances.Client
 
         public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
         {
-            var response = _service.GetClientBalances(clientId);
+            var response = await _service.GetClientBalancesAsync(clientId);
 
-            var error = response as ErrorResponse;
+            if (response is ErrorResponse error)
+            {
+                throw new Exception(error.ErrorMessage);
+            }
 
             if (response is IList<ClientBalanceResponseModel> result)
             {
                 return result;
             }
 
-            if (error != null)
-            {
-                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetClientBalances),
-                    $"clientId = {clientId}, message = {error.ErrorMessage}", null, DateTime.UtcNow);
-            }
-
-            return null;
+            throw new Exception(UexpectedApiResponse);
         }
 
         public async Task<ClientBalanceModel> GetClientBalanceByAssetId(
             AutorestClient.Models.ClientBalanceByAssetIdModel model)
         {
-            var response = _service.GetClientBalancesByAssetId(new AutorestClient.Models.ClientBalanceByAssetIdModel
+            var response = await _service.GetClientBalancesByAssetIdAsync(new AutorestClient.Models.ClientBalanceByAssetIdModel
             {
                 ClientId = model.ClientId,
                 AssetId = model.AssetId
             });
 
-            var error = response as ErrorResponse;
+            if (response is ErrorResponse error)
+            {
+                throw new Exception(error.ErrorMessage);
+            }
 
             if (response is ClientBalanceResponseModel result)
             {
                 return ClientBalanceModel.Create(result);
             }
 
-            if (error != null)
-            {
-                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetClientBalanceByAssetId),
-                    $"model = {model.ToJson()}", null, DateTime.UtcNow);
-
-                return ClientBalanceModel.Create(new ClientBalanceResponseModel {ErrorMessage = error.ErrorMessage});
-            }
-
-            return null;
+            throw new Exception(UexpectedApiResponse);
         }
 
         public async Task<WalletCredentialsModel> GetWalletCredential(string clientId)
         {
-            var response = _service.GetWalletsCredentials(clientId);
+            var response = await _service.GetWalletsCredentialsAsync(clientId);
 
-            var error = response as ErrorResponse;
+            if (response is ErrorResponse error)
+            {
+                throw new Exception(error.ErrorMessage);
+            }
 
             if (response is IWalletCredentials result)
             {
                 return WalletCredentialsModel.Create(result);
             }
 
-            if (error != null)
-            {
-                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetWalletCredential),
-                    $"clientId = {clientId}", null, DateTime.UtcNow);
-
-                return new WalletCredentialsModel { ErrorMessage = error.ErrorMessage };
-            }
-
-            return null;
+            throw new Exception(UexpectedApiResponse);
         }
 
         public async Task<WalletCredentialsHistoryModel> GetWalletCredentialHistory(string clientId)
         {
-            var response = _service.GetWalletsCredentialsHistory(clientId);
+            var response = await _service.GetWalletsCredentialsHistoryAsync(clientId);
 
-            var error = response as ErrorResponse;
+            if (response is ErrorResponse error)
+            {
+                throw new Exception(error.ErrorMessage);
+            }
 
             if (response is IList<string> result)
             {
                 return new WalletCredentialsHistoryModel {WalletsCredentialHistory = result};
             }
 
-            if (error != null)
-            {
-                await _log.WriteErrorAsync(nameof(BalancesClient), nameof(GetWalletCredentialHistory),
-                    $"clientId = {clientId}", null, DateTime.UtcNow);
-
-                return new WalletCredentialsHistoryModel { ErrorMessage = error.ErrorMessage };
-            }
-
-            return null;
+            throw new Exception(UexpectedApiResponse);
         }
 
         public void Dispose()
