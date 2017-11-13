@@ -26,21 +26,26 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("getWalletsCredentials/{clientId}")]
         [SwaggerOperation("GetWalletsCredentials")]
-        [ProducesResponseType(typeof(IWalletCredentials), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IWalletCredentials), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetWalletsCredentials(string clientId)
         {
             try
             {
                 var walletCredentials = await _walletCredentialsRepository.GetAsync(clientId);
-                
+
+                if (walletCredentials == null)
+                    return NotFound();
+
                 return Ok(walletCredentials);
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletCredentialController), nameof(GetWalletsCredentials), $"clientId = {clientId}", ex);
+                await _log.WriteErrorAsync(nameof(WalletCredentialController), nameof(GetWalletsCredentials),
+                    $"clientId = {clientId}", ex);
 
-                return BadRequest(ErrorResponse.Create(ex.Message));
+                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials"));
             }
         }
     }
