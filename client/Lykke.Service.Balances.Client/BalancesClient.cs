@@ -48,6 +48,11 @@ namespace Lykke.Service.Balances.Client
                 AssetId = model.AssetId
             });
 
+            if (response == null)
+            {
+                return null;
+            }
+
             if (response is ErrorResponse error)
             {
                 throw new Exception(error.ErrorMessage);
@@ -64,6 +69,11 @@ namespace Lykke.Service.Balances.Client
         public async Task<WalletCredentialsModel> GetWalletCredential(string clientId)
         {
             var response = await _service.GetWalletsCredentialsAsync(clientId);
+
+            if (response == null)
+            {
+                return null;
+            }
 
             if (response is ErrorResponse error)
             {
