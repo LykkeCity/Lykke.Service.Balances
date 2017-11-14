@@ -26,7 +26,7 @@ namespace Lykke.Service.Balances.Controllers
         }
 
         [HttpGet]
-        [Route("getClientBalances/{clientId}")]
+        [Route("{clientId}")]
         [SwaggerOperation("GetClientBalances")]
         [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
@@ -53,19 +53,13 @@ namespace Lykke.Service.Balances.Controllers
         }
 
         [HttpGet]
-        [Route("getClientBalancesByAssetId/{assetId}")]
+        [Route("{clientId}/{assetId}")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetClientBalancesByAssetId(string assetId, [FromQuery] string clientId)
+        public async Task<IActionResult> GetClientBalancesByAssetId(string clientId, string assetId)
         {
-            if (string.IsNullOrWhiteSpace(clientId))
-            {
-                return BadRequest(ErrorResponse.Create("ClientId can't be empty"));
-            }
-
             try
             {
                 var wallet = await _walletsRepository.GetAsync(clientId, assetId);

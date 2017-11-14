@@ -124,28 +124,28 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='assetId'>
-            /// </param>
             /// <param name='clientId'>
             /// </param>
-            public static object GetClientBalancesByAssetId(this IBalancesAPI operations, string assetId, string clientId = default(string))
+            /// <param name='assetId'>
+            /// </param>
+            public static object GetClientBalancesByAssetId(this IBalancesAPI operations, string clientId, string assetId)
             {
-                return operations.GetClientBalancesByAssetIdAsync(assetId, clientId).GetAwaiter().GetResult();
+                return operations.GetClientBalancesByAssetIdAsync(clientId, assetId).GetAwaiter().GetResult();
             }
 
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='assetId'>
-            /// </param>
             /// <param name='clientId'>
+            /// </param>
+            /// <param name='assetId'>
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, string assetId, string clientId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, string clientId, string assetId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(assetId, clientId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(clientId, assetId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
