@@ -26,7 +26,7 @@ namespace Lykke.Service.Balances.Controllers
         }
 
         [HttpGet]
-        [Route("getClientBalances/{clientId}")]
+        [Route("{clientId}")]
         [SwaggerOperation("GetClientBalances")]
         [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
@@ -53,16 +53,16 @@ namespace Lykke.Service.Balances.Controllers
         }
 
         [HttpGet]
-        [Route("getClientBalancesByAssetId")]
+        [Route("{clientId}/{assetId}")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetClientBalancesByAssetId([FromBody] ClientBalanceByAssetIdModel model)
+        public async Task<IActionResult> GetClientBalancesByAssetId(string clientId, string assetId)
         {
             try
             {
-                var wallet = await _walletsRepository.GetAsync(model.ClientId, model.AssetId);
+                var wallet = await _walletsRepository.GetAsync(clientId, assetId);
 
                 if (wallet == null)
                     return NotFound();
@@ -72,9 +72,10 @@ namespace Lykke.Service.Balances.Controllers
             catch (Exception ex)
             {
                 await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
-                    nameof(GetClientBalancesByAssetId), $"model = {model.ToJson()}", ex);
+                    nameof(GetClientBalancesByAssetId), $"clientId = {clientId}, assetId = {assetId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting client balance by asset"));
+                return StatusCode((int) HttpStatusCode.InternalServerError,
+                    ErrorResponse.Create("Error occured while getting client balance by asset"));
             }
         }
     }

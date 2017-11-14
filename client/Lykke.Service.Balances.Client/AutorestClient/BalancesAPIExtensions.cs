@@ -124,24 +124,28 @@ namespace Lykke.Service.Balances.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='model'>
+            /// <param name='clientId'>
             /// </param>
-            public static object GetClientBalancesByAssetId(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel))
+            /// <param name='assetId'>
+            /// </param>
+            public static object GetClientBalancesByAssetId(this IBalancesAPI operations, string clientId, string assetId)
             {
-                return operations.GetClientBalancesByAssetIdAsync(model).GetAwaiter().GetResult();
+                return operations.GetClientBalancesByAssetIdAsync(clientId, assetId).GetAwaiter().GetResult();
             }
 
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='model'>
+            /// <param name='clientId'>
+            /// </param>
+            /// <param name='assetId'>
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetClientBalancesByAssetIdAsync(this IBalancesAPI operations, string clientId, string assetId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetClientBalancesByAssetIdWithHttpMessagesAsync(clientId, assetId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

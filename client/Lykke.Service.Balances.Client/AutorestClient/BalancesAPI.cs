@@ -619,7 +619,7 @@ namespace Lykke.Service.Balances.AutorestClient
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/getClientBalances/{clientId}").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/{clientId}").ToString();
             _url = _url.Replace("{clientId}", System.Uri.EscapeDataString(clientId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
@@ -726,7 +726,9 @@ namespace Lykke.Service.Balances.AutorestClient
             return _result;
         }
 
-        /// <param name='model'>
+        /// <param name='clientId'>
+        /// </param>
+        /// <param name='assetId'>
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -740,11 +742,25 @@ namespace Lykke.Service.Balances.AutorestClient
         /// <exception cref="SerializationException">
         /// Thrown when unable to deserialize the response
         /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<object>> GetClientBalancesByAssetIdWithHttpMessagesAsync(ClientBalanceByAssetIdModel model = default(ClientBalanceByAssetIdModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<object>> GetClientBalancesByAssetIdWithHttpMessagesAsync(string clientId, string assetId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (clientId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "clientId");
+            }
+            if (assetId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "assetId");
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -752,13 +768,16 @@ namespace Lykke.Service.Balances.AutorestClient
             {
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("model", model);
+                tracingParameters.Add("clientId", clientId);
+                tracingParameters.Add("assetId", assetId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "GetClientBalancesByAssetId", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/getClientBalancesByAssetId").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WalletsClientBalances/{clientId}/{assetId}").ToString();
+            _url = _url.Replace("{clientId}", System.Uri.EscapeDataString(clientId));
+            _url = _url.Replace("{assetId}", System.Uri.EscapeDataString(assetId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -781,12 +800,6 @@ namespace Lykke.Service.Balances.AutorestClient
 
             // Serialize Request
             string _requestContent = null;
-            if(model != null)
-            {
-                _requestContent = SafeJsonConvert.SerializeObject(model, SerializationSettings);
-                _httpRequest.Content = new StringContent(_requestContent, System.Text.Encoding.UTF8);
-                _httpRequest.Content.Headers.ContentType =System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json-patch+json; charset=utf-8");
-            }
             // Send Request
             if (_shouldTrace)
             {

@@ -14,7 +14,6 @@ namespace Lykke.Service.Balances.Client.ResponseModels
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance,
-                ErrorMessage = src.ErrorMessage
             };
         }
     }
