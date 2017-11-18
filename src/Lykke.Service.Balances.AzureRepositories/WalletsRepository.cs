@@ -34,29 +34,6 @@ namespace Lykke.Service.Balances.AzureRepositories
             return entities.FirstOrDefault(itm => itm.AssetId == assetId);
         }
 
-        public Task UpdateBalanceAsync(string traderId, string assetId, double balance)
-        {
-            var partitionKey = WalletEntity.GeneratePartitionKey();
-            var rowKey = WalletEntity.GenerateRowKey(assetId);
-
-            return _tableStorage.InsertOrModifyAsync(partitionKey, rowKey,
-
-                () =>
-                {
-                    var newEntity = WalletEntity.Create(traderId);
-                    newEntity.UpdateBalance(assetId, balance);
-                    return newEntity;
-                },
-
-                entity =>
-                {
-                    entity.UpdateBalance(assetId, balance);
-                    return entity;
-                }
-
-                );
-        }
-
         public async Task<Dictionary<string, double>> GetTotalBalancesAsync()
         {
             var result = new Dictionary<string, double>();

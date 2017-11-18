@@ -15,5 +15,6 @@
     {
         public string LogsConnString { get; set; }
         public string ClientPersonalInfoConnString { get; set; }
+        public string BalancesConnString { get; set; }
     }
 }
