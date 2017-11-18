@@ -6,6 +6,7 @@ namespace Lykke.Service.Balances.Client.ResponseModels
     {
         public string AssetId { get; set; }
         public double? Balance { get; set; }
+        public double? Reserved { get; set; }
         public string ErrorMessage { get; set; }
 
         public static ClientBalanceModel Create(ClientBalanceResponseModel src)
@@ -14,6 +15,7 @@ namespace Lykke.Service.Balances.Client.ResponseModels
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance,
+                Reserved = src.Reserved
             };
         }
     }
