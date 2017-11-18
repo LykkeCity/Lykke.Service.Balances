@@ -19,16 +19,6 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
 
             [JsonProperty("reserved")]
             public double Reserved { get; set; }
-
-
-            public static TheWallet Create(string assetId, double balance)
-            {
-                return new TheWallet
-                {
-                    AssetId = assetId,
-                    Balance = balance
-                };
-            }
         }
 
         public static string GeneratePartitionKey()
@@ -44,25 +34,6 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
         public string ClientId => RowKey;
 
         public string Balances { get; set; }
-
-        internal void UpdateBalance(string assetId, double balanceDelta)
-        {
-            var data = Get();
-            var element = data.FirstOrDefault(itm => itm.AssetId == assetId);
-
-            if (element != null)
-            {
-                element.Balance += balanceDelta;
-                Balances = data.ToJson();
-                return;
-            }
-
-            var list = new List<TheWallet>();
-            list.AddRange(data);
-            list.Add(TheWallet.Create(assetId, balanceDelta));
-            Balances = list.ToJson();
-
-        }
 
         internal static readonly TheWallet[] EmptyList = new TheWallet[0];
 
