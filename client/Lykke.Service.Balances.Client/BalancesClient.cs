@@ -42,7 +42,7 @@ namespace Lykke.Service.Balances.Client
         public async Task<ClientBalanceModel> GetClientBalanceByAssetId(
             AutorestClient.Models.ClientBalanceByAssetIdModel model)
         {
-            var response = await _service.GetClientBalancesByAssetIdAsync(model.AssetId, model.ClientId);
+            var response = await _service.GetClientBalancesByAssetIdAsync(model.ClientId, model.AssetId);
 
             if (response == null)
             {
