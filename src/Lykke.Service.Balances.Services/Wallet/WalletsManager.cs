@@ -81,7 +81,7 @@ namespace Lykke.Service.Balances.Services.Wallet
 
         private static string GetCacheKey(string clientId)
         {
-            return $"{clientId}:Total";
+            return $":{clientId}:Total";
         }
     }
 }
