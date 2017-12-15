@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.Balances.AzureRepositories;
@@ -12,8 +13,7 @@ using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Redis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Service.Balances.Modules
 {
@@ -22,12 +22,15 @@ namespace Lykke.Service.Balances.Modules
         private readonly BalancesSettings _settings;
         private readonly IReloadingManager<DbSettings> _dbSettings;
         private readonly ILog _log;
+        private readonly ServiceCollection _services;
 
         public ServiceModule(BalancesSettings settings, IReloadingManager<DbSettings> dbSettings, ILog log)
         {
             _settings = settings;
             _dbSettings = dbSettings;
             _log = log;
+
+            _services = new ServiceCollection();
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -46,6 +49,8 @@ namespace Lykke.Service.Balances.Modules
                 .As<IShutdownManager>();
 
             RegisterWallets(builder);
+
+            builder.Populate(_services);
         }
 
         private void RegisterWallets(ContainerBuilder builder)
@@ -54,13 +59,11 @@ namespace Lykke.Service.Balances.Modules
                 .As<IWalletsManager>()
                 .WithParameter(TypedParameter.From(_settings.BalanceCache.Expiration));
 
-            builder.Register(c => new RedisCache(new RedisCacheOptions
-                {
-                    Configuration = _settings.BalanceCache.Configuration,
-                    InstanceName = _settings.BalanceCache.Instance
-                }))
-                .As<IDistributedCache>()
-                .SingleInstance();
+            _services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = _settings.BalanceCache.Configuration;
+                options.InstanceName = _settings.BalanceCache.Instance;
+            });
 
             builder.RegisterType<BalanceUpdateRabbitSubscriber>()
                 .As<IStartable>()
