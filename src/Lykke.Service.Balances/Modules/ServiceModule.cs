@@ -68,7 +68,7 @@ namespace Lykke.Service.Balances.Modules
                 .SingleInstance()
                 .WithParameter(TypedParameter.From(_settings.BalanceRabbit.ConnectionString));
 
-            builder.RegisterType<BalanceUpdateRabbitSubscriber>()
+            builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
