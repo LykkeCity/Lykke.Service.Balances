@@ -57,8 +57,11 @@ namespace Lykke.Service.Balances
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
                 Log = CreateLogWithSlack(services, appSettings);
-                builder.RegisterModule(new ServiceModule(appSettings.CurrentValue.BalancesService, appSettings.Nested(s => s.BalancesService.Db), Log));
+
                 builder.Populate(services);
+                // Should be after builder.Populate(services) to allow standart services overwriting
+                builder.RegisterModule(new ServiceModule(appSettings.CurrentValue.BalancesService, appSettings.Nested(s => s.BalancesService.Db), Log));
+                
                 ApplicationContainer = builder.Build();
 
                 return new AutofacServiceProvider(ApplicationContainer);
