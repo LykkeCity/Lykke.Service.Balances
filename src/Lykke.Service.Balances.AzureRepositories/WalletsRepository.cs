@@ -1,24 +1,33 @@
 ﻿using AzureStorage;
 using Lykke.Service.Balances.AzureRepositories.Account;
-using Lykke.Service.Balances.Core.Wallets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.AzureRepositories
 {
+    [UsedImplicitly]
     public class WalletsRepository : IWalletsRepository
     {
+        private readonly ILog _log;
         private readonly INoSQLTableStorage<WalletEntity> _tableStorage;
 
-        public WalletsRepository(INoSQLTableStorage<WalletEntity> tableStorage)
+        public WalletsRepository(ILog log, INoSQLTableStorage<WalletEntity> tableStorage)
         {
+            _log = log;
             _tableStorage = tableStorage;
         }
 
         public async Task<IEnumerable<IWallet>> GetAsync(string traderId)
         {
+#if DEBUG
+            await _log.WriteInfoAsync("Get wallet from the storage", traderId, string.Empty);
+#endif
+
             var partitionKey = WalletEntity.GeneratePartitionKey();
             var rowKey = WalletEntity.GenerateRowKey(traderId);
             var entity = await _tableStorage.GetDataAsync(partitionKey, rowKey);
@@ -26,12 +35,6 @@ namespace Lykke.Service.Balances.AzureRepositories
             return entity == null
                 ? WalletEntity.EmptyList
                 : entity.Get();
-        }
-
-        public async Task<IWallet> GetAsync(string traderId, string assetId)
-        {
-            var entities = await GetAsync(traderId);
-            return entities.FirstOrDefault(itm => itm.AssetId == assetId);
         }
 
         public async Task<Dictionary<string, double>> GetTotalBalancesAsync()

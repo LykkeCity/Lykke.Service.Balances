@@ -1,4 +1,6 @@
-﻿namespace Lykke.Service.Balances.Core.Wallets
+﻿using Newtonsoft.Json;
+
+namespace Lykke.Service.Balances.Core.Domain.Wallets
 {
     public interface IWallet
     {

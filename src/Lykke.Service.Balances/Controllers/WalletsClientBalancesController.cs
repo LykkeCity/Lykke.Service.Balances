@@ -1,5 +1,4 @@
 ﻿using Common.Log;
-using Lykke.Service.Balances.Core.Wallets;
 using Lykke.Service.Balances.Models.ClientBalances;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
@@ -8,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Common;
+using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Models;
 
 namespace Lykke.Service.Balances.Controllers
@@ -16,12 +15,12 @@ namespace Lykke.Service.Balances.Controllers
     [Route("api/[controller]")]
     public class WalletsClientBalancesController : Controller
     {
-        private readonly IWalletsRepository _walletsRepository;
+        private readonly IWalletsManager _walletsManager;
         private readonly ILog _log;
 
-        public WalletsClientBalancesController(IWalletsRepository walletsRepository, ILog log)
+        public WalletsClientBalancesController(IWalletsManager walletsManager, ILog log)
         {
-            _walletsRepository = walletsRepository;
+            _walletsManager = walletsManager;
             _log = log;
         }
 
@@ -34,11 +33,8 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var wallets = (await _walletsRepository.GetAsync(clientId)).ToArray();
-
-                var result = wallets.Any()
-                    ? wallets.Select(ClientBalanceResponseModel.Create)
-                    : new ClientBalanceResponseModel[0];
+                var wallets = await _walletsManager.GetAsync(clientId);
+                var result = wallets.Select(ClientBalanceResponseModel.Create);
                    
                 return Ok(result);
             }
@@ -62,7 +58,7 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var wallet = await _walletsRepository.GetAsync(clientId, assetId);
+                var wallet = await _walletsManager.GetAsync(clientId, assetId);
 
                 if (wallet == null)
                     return NotFound();

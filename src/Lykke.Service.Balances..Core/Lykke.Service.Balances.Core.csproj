@@ -8,11 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="1.1.97" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Domain\" />
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="Lykke.Common" Version="3.0.2" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Lykke.Service.Balances.Core.Wallets;
+﻿using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.AzureRepositories.Wallets
 {

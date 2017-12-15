@@ -1,9 +1,9 @@
 ﻿using Common;
-using Lykke.Service.Balances.Core.Wallets;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.AzureRepositories.Account
 {

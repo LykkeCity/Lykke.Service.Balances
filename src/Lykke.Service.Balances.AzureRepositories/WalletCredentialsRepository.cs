@@ -1,13 +1,15 @@
 ﻿using AzureStorage;
 using Lykke.Service.Balances.AzureRepositories.Wallets;
-using Lykke.Service.Balances.Core.Wallets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.AzureRepositories
 {
+    [UsedImplicitly]
     public class WalletCredentialsRepository : IWalletCredentialsRepository
     {
         private readonly INoSQLTableStorage<WalletCredentialsEntity> _tableStorage;
