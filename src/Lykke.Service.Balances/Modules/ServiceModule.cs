@@ -4,22 +4,29 @@ using Common.Log;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.AzureRepositories.Account;
 using Lykke.Service.Balances.AzureRepositories.Wallets;
+using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services;
-using Lykke.Service.Balances.Core.Wallets;
+using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.RabbitSubscribers;
 using Lykke.Service.Balances.Services;
+using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Redis;
 
 namespace Lykke.Service.Balances.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<BalancesSettings> _settings;
+        private readonly BalancesSettings _settings;
+        private readonly IReloadingManager<DbSettings> _dbSettings;
         private readonly ILog _log;
 
-        public ServiceModule(IReloadingManager<BalancesSettings> settings, ILog log)
+        public ServiceModule(BalancesSettings settings, IReloadingManager<DbSettings> dbSettings, ILog log)
         {
             _settings = settings;
+            _dbSettings = dbSettings;
             _log = log;
         }
 
@@ -29,7 +36,7 @@ namespace Lykke.Service.Balances.Modules
                 .As<ILog>()
                 .SingleInstance();
 
-            builder.RegisterInstance(_settings)
+            builder.RegisterInstance(_dbSettings)
                 .SingleInstance();
 
             builder.RegisterType<StartupManager>()
@@ -37,6 +44,35 @@ namespace Lykke.Service.Balances.Modules
 
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
+
+            RegisterWallets(builder);
+        }
+
+        private void RegisterWallets(ContainerBuilder builder)
+        {
+            builder.RegisterType<WalletsManager>()
+                .As<IWalletsManager>()
+                .WithParameter(TypedParameter.From(_settings.BalanceCache.Expiration));
+
+            builder.Register(c => new RedisCache(new RedisCacheOptions
+                {
+                    Configuration = _settings.BalanceCache.Configuration,
+                    InstanceName = _settings.BalanceCache.Instance
+                }))
+                .As<IDistributedCache>()
+                .SingleInstance();
+
+            builder.RegisterType<BalanceUpdateRabbitSubscriber>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_settings.BalanceRabbit.ConnectionString));
+
+            builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_settings.AuthRabbit.ConnectionString));
 
             builder.RegisterType<WalletsRepository>()
                 .As<IWalletsRepository>().SingleInstance();
@@ -49,16 +85,16 @@ namespace Lykke.Service.Balances.Modules
 
             builder.Register(kernel =>
                 AzureTableStorage<WalletEntity>.Create(
-                    _settings.ConnectionString(x => x.Db.BalancesConnString), "Accounts",
+                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Accounts",
                     kernel.Resolve<ILog>())).SingleInstance();
 
             builder.Register(kernel => AzureTableStorage<WalletCredentialsEntity>.Create(
-                _settings.ConnectionString(x => x.Db.ClientPersonalInfoConnString), "WalletCredentials",
+                _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentials",
                 kernel.Resolve<ILog>())).SingleInstance();
 
             builder.Register(kernel =>
                 AzureTableStorage<WalletCredentialsHistoryRecord>.Create(
-                    _settings.ConnectionString(x => x.Db.ClientPersonalInfoConnString), "WalletCredentialsHistory",
+                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentialsHistory",
                     kernel.Resolve<ILog>())).SingleInstance();
         }
     }

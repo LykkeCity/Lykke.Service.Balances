@@ -1,10 +1,10 @@
 ﻿using Common.Log;
-using Lykke.Service.Balances.Core.Wallets;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Models;
 
 namespace Lykke.Service.Balances.Controllers

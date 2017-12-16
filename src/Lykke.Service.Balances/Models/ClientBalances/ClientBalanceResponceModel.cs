@@ -1,4 +1,6 @@
 ﻿
+using Lykke.Service.Balances.Core.Domain.Wallets;
+
 namespace Lykke.Service.Balances.Models.ClientBalances
 {
     public class ClientBalanceResponseModel
@@ -7,7 +9,7 @@ namespace Lykke.Service.Balances.Models.ClientBalances
         public double Balance { get; set; }
         public double Reserved { get; set; }
 
-        public static ClientBalanceResponseModel Create(Core.Wallets.IWallet src)
+        public static ClientBalanceResponseModel Create(IWallet src)
         {
             return new ClientBalanceResponseModel
             {
