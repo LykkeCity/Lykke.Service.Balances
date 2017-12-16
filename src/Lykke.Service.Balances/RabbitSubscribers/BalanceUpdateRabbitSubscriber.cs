@@ -67,14 +67,9 @@ namespace Lykke.Service.Balances.RabbitSubscribers
             var tasks = message.Balances
                 .Where(b => b.ClientId != null && b.Asset != null)
                 .GroupBy(b => b.ClientId)
-                .Select(g => Task.Run(async () =>
-                    {
-                        foreach (var b in g)
-                        {
-                            await _walletsManager.UpdateBalanceAsync(g.Key, b.Asset, b.NewBalance, b.NewReserved);
-                        }
-                    }
-                ));
+                .Select(g => _walletsManager.UpdateBalanceAsync(
+                    g.Key, 
+                    g.Select(b => (Asset: b.Asset, Balance: b.NewBalance, Reserved: b.NewReserved))));
 
             await Task.WhenAll(tasks);
         }

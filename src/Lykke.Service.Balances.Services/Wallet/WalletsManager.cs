@@ -42,7 +42,7 @@ namespace Lykke.Service.Balances.Services.Wallet
         /// <remarks>
         /// Method calls with single <paramref name="clientId"/>, should be synchornized
         /// </remarks>
-        public async Task UpdateBalanceAsync(string clientId, string asset, double balance, double reserved)
+        public async Task UpdateBalanceAsync(string clientId, IEnumerable<(string Asset, double Balance, double Reserved)> assetBalances)
         {
             // NOTE: This is not atomic cache update. Due to this, service can't be scaled out.
 
@@ -51,17 +51,20 @@ namespace Lykke.Service.Balances.Services.Wallet
 
             if (cachedValue != null)
             {
-                var cachedWallet = cachedValue.FirstOrDefault(w => w.AssetId == asset);
-
-                if (cachedWallet != null)
+                foreach (var assetBalance in assetBalances)
                 {
-                    cachedWallet.Update(balance, reserved);
-                }
-                else
-                {
-                    var newWallet = CachedWalletModel.Create(asset, balance, reserved);
+                    var cachedWallet = cachedValue.FirstOrDefault(w => w.AssetId == assetBalance.Asset);
 
-                    cachedValue.Add(newWallet);
+                    if (cachedWallet != null)
+                    {
+                        cachedWallet.Update(assetBalance.Balance, assetBalance.Reserved);
+                    }
+                    else
+                    {
+                        var newWallet = CachedWalletModel.Create(assetBalance.Asset, assetBalance.Balance, assetBalance.Reserved);
+
+                        cachedValue.Add(newWallet);
+                    }
                 }
 
                 await _cache.UpdateCacheAsync(cacheKey, cachedValue, slidingExpiration: _cacheExpiration);
