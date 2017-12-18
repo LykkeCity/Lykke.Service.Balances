@@ -16,5 +16,11 @@ namespace Lykke.Service.Balances.Client
 
             builder.RegisterInstance(new BalancesClient(serviceUrl, log)).As<IBalancesClient>().SingleInstance();
         }
+
+        public static void RegisterBalancesClient(this ContainerBuilder builder, BalancesServiceClientSettings settings,
+            ILog log)
+        {
+            builder.RegisterBalancesClient(settings.ServiceUrl, log);
+        }
     }
 }
