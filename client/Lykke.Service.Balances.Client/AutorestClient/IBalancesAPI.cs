@@ -87,5 +87,13 @@ namespace Lykke.Service.Balances.AutorestClient
         /// </param>
         Task<HttpOperationResponse<object>> GetClientBalancesByAssetIdWithHttpMessagesAsync(string clientId, string assetId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<object>> GetTotalBalancesWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }

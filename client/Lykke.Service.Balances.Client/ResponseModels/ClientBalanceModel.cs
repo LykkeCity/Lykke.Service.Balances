@@ -5,8 +5,8 @@ namespace Lykke.Service.Balances.Client.ResponseModels
     public class ClientBalanceModel
     {
         public string AssetId { get; set; }
-        public double? Balance { get; set; }
-        public double? Reserved { get; set; }
+        public decimal Balance { get; set; }
+        public decimal Reserved { get; set; }
         public string ErrorMessage { get; set; }
 
         public static ClientBalanceModel Create(ClientBalanceResponseModel src)

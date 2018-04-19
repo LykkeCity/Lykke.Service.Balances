@@ -1,8 +1,8 @@
-﻿using Lykke.Service.Balances.Models;
-using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.SwaggerGen.Annotations;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
+using Lykke.Common.Api.Contract.Responses;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Balances.Controllers
 {

@@ -10,12 +10,14 @@ using Microsoft.Extensions.Logging;
 using System;
 using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Settings;
 using Lykke.SlackNotification.AzureQueue;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Lykke.Service.Balances
 {
@@ -52,6 +54,12 @@ namespace Lykke.Service.Balances
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "Balances API");
+                    options.MakeResponseValueTypesRequired();
+                    options.MapType<decimal>(() => new Schema
+                    {
+                        Type = "number",
+                        Format = "decimal"
+                    });
                 });
 
                 var builder = new ContainerBuilder();
@@ -82,11 +90,15 @@ namespace Lykke.Service.Balances
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseLykkeMiddleware("Balances", ex => new { Message = "Technical problem" });
+                app.UseLykkeMiddleware("Balances", ex => ErrorResponse.Create("Technical problem"));
 
                 app.UseMvc();
                 app.UseSwagger();
-                app.UseSwaggerUi();
+                app.UseSwaggerUI(x =>
+                {
+                    x.RoutePrefix = "swagger/ui";
+                    x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                });
                 app.UseStaticFiles();
 
                 appLifetime.ApplicationStarted.Register(StartApplication);

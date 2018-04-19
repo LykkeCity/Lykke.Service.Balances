@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -7,32 +6,28 @@
     <AssemblyName>Lykke.Service.Balances</AssemblyName>
     <RootNamespace>Lykke.Service.Balances</RootNamespace>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\Lykke.Service.Balances.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.0\Lykke.Service.Balances.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
-  
   <ItemGroup>
     <None Update="Dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="4.5.0" />
-    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.0.13" />
-    <PackageReference Include="Lykke.Logs" Version="3.6.0" />
+    <PackageReference Include="Lykke.Common" Version="6.1.0" />
+    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.4.0" />
+    <PackageReference Include="Lykke.Logs" Version="3.6.2" />
     <PackageReference Include="Lykke.RabbitMqBroker" Version="4.3.0" />
     <PackageReference Include="Lykke.Service.MatchingEngine.Contracts" Version="1.2.1" />
     <PackageReference Include="Lykke.Service.Registration" Version="1.0.33" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
-    <PackageReference Include="Lykke.SettingsReader" Version="2.1.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="2.3.1" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
@@ -40,21 +35,16 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
-    <PackageReference Include="Swashbuckle.SwaggerGen" Version="6.0.0-beta902" />
-    <PackageReference Include="Swashbuckle.SwaggerUi" Version="6.0.0-beta902" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
   </ItemGroup>
-  
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.AzureRepositories\Lykke.Service.Balances.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.Services\Lykke.Service.Balances.Services.csproj" />
   </ItemGroup>
-  
   <ItemGroup>
     <Compile Update="Strings\Phrases.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -62,19 +52,16 @@
       <DependentUpon>Phrases.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  
   <ItemGroup>
     <EmbeddedResource Update="Strings\Phrases.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Phrases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
       <DocFile Include="bin\*\*\Lykke.Service.Balances.xml" />
     </ItemGroup>
     <Copy SourceFiles="@(DocFile)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="false" />
   </Target>
-
 </Project>

@@ -69,7 +69,7 @@ namespace Lykke.Service.Balances.RabbitSubscribers
                 .GroupBy(b => b.ClientId)
                 .Select(g => _walletsManager.UpdateBalanceAsync(
                     g.Key, 
-                    g.Select(b => (Asset: b.Asset, Balance: b.NewBalance, Reserved: b.NewReserved))));
+                    g.Select(b => (Asset: b.Asset, Balance: (decimal)b.NewBalance, Reserved: (decimal)b.NewReserved))));
 
             await Task.WhenAll(tasks);
         }

@@ -1,56 +1,40 @@
-﻿using Common;
-using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Lykke.AzureStorage.Tables;
+using Lykke.AzureStorage.Tables.Entity.Annotation;
+using Lykke.AzureStorage.Tables.Entity.ValueTypesMerging;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.AzureRepositories.Account
 {
-    public class WalletEntity : TableEntity
+    [ValueTypeMergingStrategy(ValueTypeMergingStrategy.UpdateAlways)]
+    public class WalletEntity : AzureTableEntity, IWallet
     {
-        public class TheWallet : IWallet
-        {
-            [JsonProperty("balance")]
-            public double Balance { get; set; }
+        public string WalletId => PartitionKey;
+        public string AssetId => RowKey;
+        public decimal Balance { get; set; }
+        public decimal Reserved { get; set; }
+        
+        internal static string GeneratePartitionKey(string walletId) => walletId;
+        internal static string GenerateRowKey(string assetId) => assetId;
 
-            [JsonProperty("asset")]
-            public string AssetId { get; set; }
-
-            [JsonProperty("reserved")]
-            public double Reserved { get; set; }
-        }
-
-        public static string GeneratePartitionKey()
-        {
-            return "ClientBalance";
-        }
-
-        public static string GenerateRowKey(string traderId)
-        {
-            return traderId;
-        }
-
-        public string ClientId => RowKey;
-
-        public string Balances { get; set; }
-
-        internal static readonly TheWallet[] EmptyList = new TheWallet[0];
-
-        internal TheWallet[] Get()
-        {
-            if (string.IsNullOrEmpty(Balances))
-                return EmptyList;
-
-            return Balances.DeserializeJson(() => EmptyList);
-        }
-        public static WalletEntity Create(string clientId)
+        internal static WalletEntity Create(string walletId, IWallet src)
         {
             return new WalletEntity
             {
-                PartitionKey = GeneratePartitionKey(),
-                RowKey = GenerateRowKey(clientId),
-
+                PartitionKey = GeneratePartitionKey(walletId),
+                RowKey = GenerateRowKey(src.AssetId),
+                Balance = src.Balance,
+                Reserved = src.Reserved
+            };
+        }
+        
+        internal static WalletEntity Create(string walletId, string assetId, decimal balance, decimal reserved)
+        {
+            return new WalletEntity
+            {
+                PartitionKey = GeneratePartitionKey(walletId),
+                RowKey = GenerateRowKey(assetId),
+                Balance = balance,
+                Reserved = reserved
             };
         }
     }

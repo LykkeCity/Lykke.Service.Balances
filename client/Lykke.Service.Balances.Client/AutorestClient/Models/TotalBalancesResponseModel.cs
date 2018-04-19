@@ -11,23 +11,22 @@ namespace Lykke.Service.Balances.AutorestClient.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class ErrorResponse
+    public partial class TotalBalancesResponseModel
     {
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the TotalBalancesResponseModel class.
         /// </summary>
-        public ErrorResponse()
+        public TotalBalancesResponseModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the TotalBalancesResponseModel class.
         /// </summary>
-        public ErrorResponse(string errorMessage = default(string), IDictionary<string, IList<string>> modelErrors = default(IDictionary<string, IList<string>>))
+        public TotalBalancesResponseModel(IDictionary<string, decimal?> balances = default(IDictionary<string, decimal?>))
         {
-            ErrorMessage = errorMessage;
-            ModelErrors = modelErrors;
+            Balances = balances;
             CustomInit();
         }
 
@@ -38,13 +37,8 @@ namespace Lykke.Service.Balances.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ErrorMessage")]
-        public string ErrorMessage { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "ModelErrors")]
-        public IDictionary<string, IList<string>> ModelErrors { get; set; }
+        [JsonProperty(PropertyName = "Balances")]
+        public IDictionary<string, decimal?> Balances { get; set; }
 
     }
 }
