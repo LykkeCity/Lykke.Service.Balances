@@ -90,7 +90,7 @@ namespace Lykke.Service.Balances.Controllers
                 if (balances == null)
                     return NotFound();
 
-                return Ok(new TotalBalancesResponseModel{ Balances =  balances });
+                return Ok(new TotalBalancesResponseModel(balances));
             }
             catch (Exception ex)
             {

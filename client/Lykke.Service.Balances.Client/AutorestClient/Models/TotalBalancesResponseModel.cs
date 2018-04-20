@@ -24,7 +24,7 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the TotalBalancesResponseModel class.
         /// </summary>
-        public TotalBalancesResponseModel(IDictionary<string, decimal?> balances = default(IDictionary<string, decimal?>))
+        public TotalBalancesResponseModel(IList<TotalAssetBalance> balances = default(IList<TotalAssetBalance>))
         {
             Balances = balances;
             CustomInit();
@@ -38,7 +38,7 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Balances")]
-        public IDictionary<string, decimal?> Balances { get; set; }
+        public IList<TotalAssetBalance> Balances { get; set; }
 
     }
 }
