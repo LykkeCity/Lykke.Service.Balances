@@ -101,7 +101,7 @@ namespace Lykke.Service.Balances.Client
             throw new Exception(UexpectedApiResponse);
         }
 
-        public async Task<TotalBalancesResponseModel> GetTotalBalances()
+        public async Task<IEnumerable<ClientBalanceResponseModel>> GetTotalBalances()
         {
             var response = await _service.GetTotalBalancesAsync();
 
@@ -110,7 +110,7 @@ namespace Lykke.Service.Balances.Client
                 throw new Exception(error.ErrorMessage);
             }
 
-            if (response is TotalBalancesResponseModel result)
+            if (response is IEnumerable<ClientBalanceResponseModel> result)
             {
                 return result;
             }

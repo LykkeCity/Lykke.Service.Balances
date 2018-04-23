@@ -981,7 +981,7 @@ namespace Lykke.Service.Balances.AutorestClient
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    _result.Body = SafeJsonConvert.DeserializeObject<TotalBalancesResponseModel>(_responseContent, DeserializationSettings);
+                    _result.Body = SafeJsonConvert.DeserializeObject<IList<ClientBalanceResponseModel>>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {
