@@ -14,6 +14,7 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
         public decimal Reserved { get; set; }
         
         internal static string GeneratePartitionKey(string walletId) => walletId;
+        internal static string GenerateTotalBalancePartitionKey() => "TotalBalance";
         internal static string GenerateRowKey(string assetId) => assetId;
 
         internal static WalletEntity Create(string walletId, IWallet src)
@@ -21,6 +22,17 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
             return new WalletEntity
             {
                 PartitionKey = GeneratePartitionKey(walletId),
+                RowKey = GenerateRowKey(src.AssetId),
+                Balance = src.Balance,
+                Reserved = src.Reserved
+            };
+        }
+        
+        internal static WalletEntity CreateTotal(IWallet src)
+        {
+            return new WalletEntity
+            {
+                PartitionKey = GenerateTotalBalancePartitionKey(),
                 RowKey = GenerateRowKey(src.AssetId),
                 Balance = src.Balance,
                 Reserved = src.Reserved

@@ -78,7 +78,7 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("totalBalances")]
         [SwaggerOperation("GetTotalBalances")]
-        [ProducesResponseType(typeof(TotalBalancesResponseModel), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetTotalBalances()
@@ -90,7 +90,8 @@ namespace Lykke.Service.Balances.Controllers
                 if (balances == null)
                     return NotFound();
 
-                return Ok(new TotalBalancesResponseModel(balances));
+                var result = balances.Select(ClientBalanceResponseModel.Create);
+                return Ok(result);
             }
             catch (Exception ex)
             {

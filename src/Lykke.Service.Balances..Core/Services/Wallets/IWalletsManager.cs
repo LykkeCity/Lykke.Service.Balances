@@ -10,6 +10,7 @@ namespace Lykke.Service.Balances.Core.Services.Wallets
         Task<IWallet> GetAsync(string walletId, string assetId);
         Task UpdateBalanceAsync(string walletId, IEnumerable<(string Asset, decimal Balance, decimal Reserved)> assetBalances);
         Task CacheItAsync(string walletId);
-        Task<Dictionary<string, decimal>> GetTotalBalancesAsync();
+        Task<IReadOnlyList<IWallet>> GetTotalBalancesAsync();
+        Task UpdateTotalBalancesAsync(List<Wallet> totalBalances);
     }
 }

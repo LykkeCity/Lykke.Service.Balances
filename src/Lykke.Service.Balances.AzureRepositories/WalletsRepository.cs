@@ -28,28 +28,20 @@ namespace Lykke.Service.Balances.AzureRepositories
             return await _tableStorage.GetDataAsync(WalletEntity.GeneratePartitionKey(walletId), WalletEntity.GenerateRowKey(assetId));
         }
 
-        public async Task<Dictionary<string, decimal>> GetTotalBalancesAsync()
+        public async Task<IEnumerable<IWallet>> GetTotalBalancesAsync()
         {
-            var result = new Dictionary<string, decimal>();
-
-            await _tableStorage.GetDataByChunksAsync(entities =>
-            {
-                foreach (var balance in entities)
-                {
-                    if (!result.ContainsKey(balance.AssetId))
-                        result.Add(balance.AssetId, balance.Balance);
-                    else
-                        result[balance.AssetId] += balance.Balance;
-                }
-            });
-
-            return result;
+            return await _tableStorage.GetDataAsync(WalletEntity.GenerateTotalBalancePartitionKey());
         }
 
         public async Task UpdateBalanceAsync(string walletId, List<IWallet> wallets)
         {
             var entities = wallets.Select(item => WalletEntity.Create(walletId, item));
             await _tableStorage.InsertOrMergeBatchAsync(entities);
+        }
+
+        public Task UpdateTotalBalancesAsync(IEnumerable<IWallet> totalBalances)
+        {
+            return _tableStorage.InsertOrMergeBatchAsync(totalBalances.Select(WalletEntity.CreateTotal));
         }
     }
 }

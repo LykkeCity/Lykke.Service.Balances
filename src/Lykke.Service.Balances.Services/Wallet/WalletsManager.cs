@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.Balances.Core.Domain.Wallets;
@@ -82,14 +83,40 @@ namespace Lykke.Service.Balances.Services.Wallet
             await _cache.UpdateCacheAsync(GetCacheKey(walletId), storedValue, slidingExpiration: _cacheExpiration);
         }
 
-        public Task<Dictionary<string, decimal>> GetTotalBalancesAsync()
+        public async Task<IReadOnlyList<IWallet>> GetTotalBalancesAsync()
         {
-            return _repository.GetTotalBalancesAsync();
+            return await _cache.TryGetFromCacheAsync(
+                GetTotalBalancesCacheKey(),
+                async () => (await _repository.GetTotalBalancesAsync())
+                    .Select(CachedWalletModel.Copy)
+                    .ToArray(),
+                slidingExpiration: _cacheExpiration);
         }
 
-        private static string GetCacheKey(string clientId)
+        public async Task UpdateTotalBalancesAsync(List<Core.Domain.Wallets.Wallet> totalBalances)
         {
-            return $":balances:{clientId}";
+            var balances = (await GetTotalBalancesAsync()).Select(CachedWalletModel.Copy).ToList();
+
+            foreach (var balance in totalBalances)
+            {
+                var currentBalance = balances.FirstOrDefault(item => item.AssetId == balance.AssetId);
+
+                if (currentBalance != null)
+                {
+                    currentBalance.Update(currentBalance.Balance + balance.Balance, currentBalance.Reserved + balance.Reserved);
+                }
+                else
+                {
+                    balances.Add(CachedWalletModel.Create(balance.AssetId, balance.Balance, balance.Reserved));
+                }
+            }
+            
+            await _cache.UpdateCacheAsync(GetTotalBalancesCacheKey(), balances, slidingExpiration: _cacheExpiration);
+            await _repository.UpdateTotalBalancesAsync(balances.Select(CachedWalletModel.Copy));
         }
+
+        private static string GetCacheKey(string clientId) => $":balances:{clientId}";
+
+        private static string GetTotalBalancesCacheKey() => ":totalBalances";
     }
 }
