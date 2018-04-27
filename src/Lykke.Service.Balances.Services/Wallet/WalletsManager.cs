@@ -48,7 +48,7 @@ namespace Lykke.Service.Balances.Services.Wallet
             // NOTE: This is not atomic cache update. Due to this, service can't be scaled out.
 
             var cacheKey = GetCacheKey(walletId);
-            var cachedValue = await _cache.TryGetFromCacheAsync<List<CachedWalletModel>>(cacheKey) ?? new List<CachedWalletModel>();
+            var cachedValue = (await GetAsync(walletId)).Select(CachedWalletModel.Copy).ToList();
             var wallets = new List<IWallet>();
 
             foreach (var assetBalance in assetBalances)
