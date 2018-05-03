@@ -22,7 +22,7 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the ClientBalanceResponseModel class.
         /// </summary>
-        public ClientBalanceResponseModel(double balance, double reserved, string assetId = default(string))
+        public ClientBalanceResponseModel(decimal balance, decimal reserved, string assetId = default(string))
         {
             AssetId = assetId;
             Balance = balance;
@@ -43,12 +43,12 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Balance")]
-        public double Balance { get; set; }
+        public decimal Balance { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Reserved")]
-        public double Reserved { get; set; }
+        public decimal Reserved { get; set; }
 
         /// <summary>
         /// Validate the object.

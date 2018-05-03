@@ -1,14 +1,14 @@
 ﻿using Common.Log;
 using Lykke.Service.Balances.Models.ClientBalances;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.SwaggerGen.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Service.Balances.Core.Services.Wallets;
-using Lykke.Service.Balances.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Balances.Controllers
 {
@@ -72,6 +72,34 @@ namespace Lykke.Service.Balances.Controllers
 
                 return StatusCode((int) HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting client balance by asset"));
+            }
+        }
+        
+        [HttpGet]
+        [Route("totalBalances")]
+        [SwaggerOperation("GetTotalBalances")]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTotalBalances()
+        {
+            try
+            {
+                var balances = await _walletsManager.GetTotalBalancesAsync();
+
+                if (balances == null)
+                    return NotFound();
+
+                var result = balances.Select(ClientBalanceResponseModel.Create);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
+                    nameof(GetTotalBalances), null, ex);
+
+                return StatusCode((int) HttpStatusCode.InternalServerError,
+                    ErrorResponse.Create("Error occured while getting total balances"));
             }
         }
     }

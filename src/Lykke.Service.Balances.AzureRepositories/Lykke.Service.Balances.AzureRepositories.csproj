@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Lykke.Service.Balances.AzureRepositories</AssemblyName>
     <RootNamespace>Lykke.Service.Balances.AzureRepositories</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Lykke.AzureStorage" Version="7.0.2" />
+    <PackageReference Include="Lykke.AzureStorage" Version="8.2.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
   </ItemGroup>
-
 </Project>

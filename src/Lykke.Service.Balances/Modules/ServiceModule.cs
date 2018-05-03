@@ -85,7 +85,7 @@ namespace Lykke.Service.Balances.Modules
 
             builder.Register(kernel =>
                 AzureTableStorage<WalletEntity>.Create(
-                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Accounts",
+                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances",
                     kernel.Resolve<ILog>())).SingleInstance();
 
             builder.Register(kernel => AzureTableStorage<WalletCredentialsEntity>.Create(

@@ -1,10 +1,8 @@
 ﻿using AzureStorage;
 using Lykke.Service.Balances.AzureRepositories.Account;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 
@@ -13,71 +11,37 @@ namespace Lykke.Service.Balances.AzureRepositories
     [UsedImplicitly]
     public class WalletsRepository : IWalletsRepository
     {
-        private readonly ILog _log;
         private readonly INoSQLTableStorage<WalletEntity> _tableStorage;
 
-        public WalletsRepository(ILog log, INoSQLTableStorage<WalletEntity> tableStorage)
+        public WalletsRepository(INoSQLTableStorage<WalletEntity> tableStorage)
         {
-            _log = log;
             _tableStorage = tableStorage;
         }
 
-        public async Task<IEnumerable<IWallet>> GetAsync(string traderId)
+        public async Task<IEnumerable<IWallet>> GetAsync(string walletId)
         {
-#if DEBUG
-            await _log.WriteInfoAsync("Get wallet from the storage", traderId, string.Empty);
-#endif
-
-            var partitionKey = WalletEntity.GeneratePartitionKey();
-            var rowKey = WalletEntity.GenerateRowKey(traderId);
-            var entity = await _tableStorage.GetDataAsync(partitionKey, rowKey);
-
-            return entity == null
-                ? WalletEntity.EmptyList
-                : entity.Get();
+            return await _tableStorage.GetDataAsync(WalletEntity.GeneratePartitionKey(walletId));
         }
 
-        public async Task<Dictionary<string, double>> GetTotalBalancesAsync()
+        public async Task<IWallet> GetAsync(string walletId, string assetId)
         {
-            var result = new Dictionary<string, double>();
-
-            await _tableStorage.GetDataByChunksAsync(entities =>
-            {
-                foreach (var walletEntity in entities)
-                    foreach (var balances in walletEntity.Get())
-                    {
-                        if (!result.ContainsKey(balances.AssetId))
-                            result.Add(balances.AssetId, balances.Balance);
-                        else
-                            result[balances.AssetId] += balances.Balance;
-                    }
-            });
-
-            return result;
+            return await _tableStorage.GetDataAsync(WalletEntity.GeneratePartitionKey(walletId), WalletEntity.GenerateRowKey(assetId));
         }
 
-        public async Task GetWalletsByChunkAsync(Func<IEnumerable<KeyValuePair<string, IEnumerable<IWallet>>>, Task> chunkCallback)
+        public async Task<IEnumerable<IWallet>> GetTotalBalancesAsync()
         {
+            return await _tableStorage.GetDataAsync(WalletEntity.GenerateTotalBalancePartitionKey());
+        }
 
-            await _tableStorage.GetDataByChunksAsync(async chunk =>
-            {
-                var yeldResult = new List<KeyValuePair<string, IEnumerable<IWallet>>>();
+        public async Task UpdateBalanceAsync(string walletId, List<IWallet> wallets)
+        {
+            var entities = wallets.Select(item => WalletEntity.Create(walletId, item));
+            await _tableStorage.InsertOrMergeBatchAsync(entities);
+        }
 
-                foreach (var walletEntity in chunk)
-                {
-                    var wallets = walletEntity.Get().Where(itm => itm.Balance != 0).ToArray();
-                    if (wallets.Length > 0)
-                        yeldResult.Add(new KeyValuePair<string, IEnumerable<IWallet>>(walletEntity.ClientId, wallets));
-                }
-
-                if (yeldResult.Count > 0)
-                {
-                    await chunkCallback(yeldResult);
-                    yeldResult.Clear();
-                }
-
-            });
+        public Task UpdateTotalBalancesAsync(IEnumerable<IWallet> totalBalances)
+        {
+            return _tableStorage.InsertOrMergeBatchAsync(totalBalances.Select(WalletEntity.CreateTotal));
         }
     }
-
 }

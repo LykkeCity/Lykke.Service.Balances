@@ -39,12 +39,12 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "ErrorMessage")]
-        public string ErrorMessage { get; private set; }
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "ModelErrors")]
-        public IDictionary<string, IList<string>> ModelErrors { get; private set; }
+        public IDictionary<string, IList<string>> ModelErrors { get; set; }
 
     }
 }

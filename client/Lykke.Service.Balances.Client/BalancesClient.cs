@@ -101,6 +101,23 @@ namespace Lykke.Service.Balances.Client
             throw new Exception(UexpectedApiResponse);
         }
 
+        public async Task<IEnumerable<ClientBalanceResponseModel>> GetTotalBalances()
+        {
+            var response = await _service.GetTotalBalancesAsync();
+
+            if (response is ErrorResponse error)
+            {
+                throw new Exception(error.ErrorMessage);
+            }
+
+            if (response is IEnumerable<ClientBalanceResponseModel> result)
+            {
+                return result;
+            }
+
+            throw new Exception(UexpectedApiResponse);
+        }
+
         public void Dispose()
         {
             if (_service == null)
