@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.Balances.Settings
+namespace Lykke.Service.Balances.Core.Settings
 {
     [UsedImplicitly]
     public class DbSettings

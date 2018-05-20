@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Lykke.Service.MatchingEngine.Contracts.Balances;
 
-namespace Lykke.Service.Balances.RabbitSubscribers.IncomingMessages
+namespace Lykke.Job.Balances.RabbitSubscribers.IncommingMessages
 {
     /// <remarks>
     /// Local projection of the <see cref="BalanceUpdatedEvent"/> without unnecessary fields, 

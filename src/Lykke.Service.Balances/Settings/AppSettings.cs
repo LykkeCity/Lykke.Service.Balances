@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Service.Balances.Core.Settings;
 
 namespace Lykke.Service.Balances.Settings
 {
