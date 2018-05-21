@@ -11,6 +11,7 @@ using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Core.Settings;
 using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
+using Lykke.Service.Balancess.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
@@ -37,6 +38,10 @@ namespace Lykke.Job.Balances.Modules
                 .SingleInstance();
 
             builder.RegisterInstance(_dbSettings)
+                .SingleInstance();
+            
+            builder.RegisterType<HealthService>()
+                .As<IHealthService>()
                 .SingleInstance();
             
             builder.RegisterType<StartupManager>()
