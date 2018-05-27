@@ -56,10 +56,10 @@ namespace Lykke.Job.Balances
                 var appSettings = Configuration.LoadSettings<AppSettings>();
 
                 Log = CreateLogWithSlack(services, appSettings);
+                
+                builder.Populate(services);
 
                 builder.RegisterModule(new JobModule(appSettings.CurrentValue.BalancesJob, appSettings.Nested(x => x.BalancesJob.Db), Log));
-
-                builder.Populate(services);
 
                 ApplicationContainer = builder.Build();
 
