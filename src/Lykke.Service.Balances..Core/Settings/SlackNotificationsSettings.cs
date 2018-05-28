@@ -1,6 +1,6 @@
 ﻿using Lykke.AzureQueueIntegration;
 
-namespace Lykke.Service.Balances.Settings
+namespace Lykke.Service.Balances.Core.Settings
 {
     public class SlackNotificationsSettings
     {

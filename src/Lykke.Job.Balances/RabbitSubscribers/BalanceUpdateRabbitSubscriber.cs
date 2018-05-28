@@ -6,13 +6,13 @@ using Autofac;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Job.Balances.RabbitSubscribers.IncommingMessages;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
-using Lykke.Service.Balances.RabbitSubscribers.IncomingMessages;
 
-namespace Lykke.Service.Balances.RabbitSubscribers
+namespace Lykke.Job.Balances.RabbitSubscribers
 {
     [UsedImplicitly]
     public class BalanceUpdateRabbitSubscriber : IStartable, IStopable

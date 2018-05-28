@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <Version>1.0.1</Version>
-    <AssemblyName>Lykke.Service.Balances</AssemblyName>
-    <RootNamespace>Lykke.Service.Balances</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\Lykke.Service.Balances.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Lykke.Service.Balances.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Update="Dockerfile">
@@ -38,30 +34,11 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
   </ItemGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.AzureRepositories\Lykke.Service.Balances.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.Services\Lykke.Service.Balances.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Strings\Phrases.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Phrases.resx</DependentUpon>
-    </Compile>
+    <Folder Include="Controllers" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Strings\Phrases.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Phrases.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
-    <ItemGroup>
-      <DocFile Include="bin\*\*\Lykke.Service.Balances.xml" />
-    </ItemGroup>
-    <Copy SourceFiles="@(DocFile)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="false" />
-  </Target>
 </Project>

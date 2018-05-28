@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.Balances.Settings
+namespace Lykke.Job.Balances.Settings
 {
     [UsedImplicitly]
     public class RabbitMqSettings

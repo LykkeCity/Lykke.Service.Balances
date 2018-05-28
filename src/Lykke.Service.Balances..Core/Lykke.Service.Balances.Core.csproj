@@ -7,6 +7,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
-    <PackageReference Include="Lykke.Common" Version="6.1.0" />
+    <PackageReference Include="Lykke.AzureQueueIntegration" Version="2.1.0" />
+    <PackageReference Include="Lykke.Common" Version="6.8.1" />
+    <PackageReference Include="Lykke.SettingsReader" Version="2.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Lykke.AzureQueueIntegration, Version=2.0.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\Users\Dmitry\.nuget\packages\lykke.azurequeueintegration\2.0.1\lib\netstandard2.0\Lykke.AzureQueueIntegration.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@ using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Registration.Models;
 
-namespace Lykke.Service.Balances.RabbitSubscribers
+namespace Lykke.Job.Balances.RabbitSubscribers
 {
     [UsedImplicitly]
     public class ClientAuthenticatedRabbitSubscriber : IStartable, IStopable
