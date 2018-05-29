@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Lykke.Job.Balances.RabbitSubscribers.IncommingMessages;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
 
 namespace Lykke.Job.Balances.RabbitSubscribers
@@ -50,6 +49,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
         private async Task ProcessMessageAsync(BalanceUpdatedEventProjection message)
         {
             var validationResult = ValidateMessage(message);
+            
             if (validationResult.Errors.Any())
             {
                 var error = $"Message will be skipped: {string.Join("\r\n", validationResult.Errors)}";
@@ -72,27 +72,6 @@ namespace Lykke.Job.Balances.RabbitSubscribers
                     g.Key, 
                     g.Select(b => (Asset: b.Asset, Balance: (decimal)b.NewBalance, Reserved: (decimal)b.NewReserved)))).ToList();
 
-            var totalBalances = new List<Wallet>();
-            
-            foreach (var balance in message.Balances.Where(b => b.ClientId != null && b.Asset != null))
-            {
-                var total = totalBalances.FirstOrDefault(item => item.AssetId == balance.Asset);
-                var balanceDelta = (decimal) (balance.NewBalance - balance.OldBalance);
-                var reservedDelta = (decimal) (balance.NewReserved - balance.OldReserved);
-
-                if (total != null)
-                {
-                    total.Balance += balanceDelta;
-                    total.Reserved += reservedDelta;
-                }
-                else
-                {
-                    totalBalances.Add(new Wallet{AssetId = balance.Asset, Balance = balanceDelta, Reserved = reservedDelta});
-                }
-            }
-            
-            tasks.Add(_walletsManager.UpdateTotalBalancesAsync(totalBalances));
-            
             await Task.WhenAll(tasks);
         }
 

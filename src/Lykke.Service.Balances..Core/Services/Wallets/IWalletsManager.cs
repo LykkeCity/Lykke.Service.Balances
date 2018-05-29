@@ -6,7 +6,7 @@ namespace Lykke.Service.Balances.Core.Services.Wallets
 {
     public interface IWalletsManager
     {
-        Task<IReadOnlyList<IWallet>> GetAsync(string walletId);
+        Task<IReadOnlyList<IWallet>> GetAllAsync(string walletId);
         Task<IWallet> GetAsync(string walletId, string assetId);
         Task UpdateBalanceAsync(string walletId, IEnumerable<(string Asset, decimal Balance, decimal Reserved)> assetBalances);
         Task CacheItAsync(string walletId);
