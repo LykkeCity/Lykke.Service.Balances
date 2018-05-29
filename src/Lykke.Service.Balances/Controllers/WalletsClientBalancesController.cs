@@ -33,7 +33,7 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var wallets = await _walletsManager.GetAsync(clientId);
+                var wallets = await _walletsManager.GetAllAsync(clientId);
                 var result = wallets.Select(ClientBalanceResponseModel.Create);
                    
                 return Ok(result);
