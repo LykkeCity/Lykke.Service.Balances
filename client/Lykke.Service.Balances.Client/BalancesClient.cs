@@ -3,6 +3,7 @@ using Lykke.Service.Balances.Client.Models;
 using Lykke.Service.Balances.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Lykke.Service.Balances.AutorestClient;
 using Lykke.Service.Balances.AutorestClient.Models;
@@ -18,7 +19,7 @@ namespace Lykke.Service.Balances.Client
 
         public BalancesClient(string serviceUrl, ILog log)
         {
-            _service = new BalancesAPI(new Uri(serviceUrl));
+            _service = new BalancesAPI(new Uri(serviceUrl), new HttpClient());
             _log = log;
         }
 
@@ -95,7 +96,7 @@ namespace Lykke.Service.Balances.Client
 
             if (response is IList<string> result)
             {
-                return new WalletCredentialsHistoryModel {WalletsCredentialHistory = result};
+                return new WalletCredentialsHistoryModel { WalletsCredentialHistory = result };
             }
 
             throw new Exception(UexpectedApiResponse);
