@@ -71,7 +71,9 @@ namespace Lykke.Service.Balances.Services.Wallet
 
         public async Task CacheItAsync(string walletId)
         {
-            var storedValue = await GetAllAsync(walletId);
+            var storedValue = (await GetAllAsync(walletId))
+                .Select(CachedWalletModel.Copy)
+                .ToArray();
 
             await _cache.UpdateCacheAsync(GetAllBalancesCacheKey(walletId), storedValue, slidingExpiration: _cacheExpiration);
         }
