@@ -12,12 +12,14 @@ namespace Lykke.Service.Balances.Services.Wallet.CacheModels
 
         public static CachedWalletModel Copy(IWallet from)
         {
-            return new CachedWalletModel
-            {
-                Balance = from.Balance,
-                AssetId = from.AssetId,
-                Reserved = from.Reserved
-            };
+            return from != null
+                ? new CachedWalletModel
+                {
+                    Balance = from.Balance,
+                    AssetId = from.AssetId,
+                    Reserved = from.Reserved
+                }
+                : null;
         }
 
         public static CachedWalletModel Create(string assetId, decimal balance, decimal reserved)
