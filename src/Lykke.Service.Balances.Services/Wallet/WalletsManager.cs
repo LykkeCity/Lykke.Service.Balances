@@ -38,7 +38,11 @@ namespace Lykke.Service.Balances.Services.Wallet
         {
             return await _cache.TryGetFromCacheAsync(
                 GetAssetBalanceCacheKey(walletId, assetId),
-                async () => CachedWalletModel.Copy(await _repository.GetAsync(walletId, assetId)),
+                async () =>
+                {
+                    IWallet balance = await _repository.GetAsync(walletId, assetId);
+                    return balance == null ? null : CachedWalletModel.Copy(balance);
+                },
                 slidingExpiration: _cacheExpiration);
         }
 
