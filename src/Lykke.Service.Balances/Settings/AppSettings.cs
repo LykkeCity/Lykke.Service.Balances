@@ -1,12 +1,11 @@
 ﻿using JetBrains.Annotations;
-using Lykke.Service.Balances.Core.Settings;
+using Lykke.Sdk.Settings;
 
 namespace Lykke.Service.Balances.Settings
 {
-    [UsedImplicitly]
-    public class AppSettings
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public class AppSettings : BaseAppSettings
     {
         public BalancesSettings BalancesService { get; set; }
-        public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 }
