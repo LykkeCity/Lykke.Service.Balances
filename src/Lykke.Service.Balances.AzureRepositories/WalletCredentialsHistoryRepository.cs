@@ -1,6 +1,5 @@
 ﻿using AzureStorage;
 using Lykke.Service.Balances.AzureRepositories.Wallets;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,12 +16,6 @@ namespace Lykke.Service.Balances.AzureRepositories
         public WalletCredentialsHistoryRepository(INoSQLTableStorage<WalletCredentialsHistoryRecord> tableStorage)
         {
             _tableStorage = tableStorage;
-        }
-
-        public async Task InsertHistoryRecord(IWalletCredentials oldWalletCredentials)
-        {
-            var entity = WalletCredentialsHistoryRecord.Create(oldWalletCredentials);
-            await _tableStorage.InsertAndGenerateRowKeyAsDateTimeAsync(entity, DateTime.UtcNow);
         }
 
         public async Task<IEnumerable<string>> GetPrevMultisigsForUser(string clientId)

@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -20,7 +21,7 @@ namespace Lykke.Service.Balances.Controllers
                         ILog log)
         {
             _walletCredentialsRepository = walletCredentialsRepository;
-            _log = log;
+            _log = log.CreateComponentScope(nameof(WalletCredentialController));
         }
 
         [HttpGet]
@@ -42,8 +43,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletCredentialController), nameof(GetWalletsCredentials),
-                    $"clientId = {clientId}", ex);
+                _log.Error(ex, $"clientId = {clientId}", nameof(GetWalletsCredentials));
 
                 return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials"));
             }

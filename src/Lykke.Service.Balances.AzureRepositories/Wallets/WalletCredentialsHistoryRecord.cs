@@ -26,29 +26,5 @@ namespace Lykke.Service.Balances.AzureRepositories.Wallets
         {
             return clientId;
         }
-
-        public static WalletCredentialsHistoryRecord Create(IWalletCredentials creds)
-        {
-            return new WalletCredentialsHistoryRecord
-            {
-                Address = creds.Address,
-                ClientId = creds.ClientId,
-                ColoredMultiSig = creds.ColoredMultiSig,
-                EncodedPrivateKey = creds.EncodedPrivateKey,
-                MultiSig = creds.MultiSig,
-                PublicKey = creds.PublicKey,
-                PrivateKey = creds.PrivateKey,
-                PreventTxDetection = creds.PreventTxDetection,
-                PartitionKey = GeneratePartitionKey(creds.ClientId),
-                BtcConvertionWalletPrivateKey = creds.BtcConvertionWalletPrivateKey,
-                BtcConvertionWalletAddress = creds.BtcConvertionWalletAddress,
-                EthConversionWalletAddress = creds.EthConversionWalletAddress,
-                EthAddress = creds.EthAddress,
-                EthPublicKey = creds.EthPublicKey,
-                SolarCoinWalletAddress = creds.SolarCoinWalletAddress,
-                ChronoBankContract = creds.ChronoBankContract,
-                QuantaContract = creds.QuantaContract
-            };
-        }
     }
 }

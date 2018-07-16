@@ -9,6 +9,5 @@ namespace Lykke.Service.Balances.Core.Domain.Wallets
         Task<IWallet> GetAsync(string walletId, string assetId);
         Task<IEnumerable<IWallet>> GetTotalBalancesAsync();
         Task UpdateBalanceAsync(string walletId, List<IWallet> wallets);
-        Task UpdateTotalBalancesAsync(IEnumerable<IWallet> totalBalances);
     }
 }

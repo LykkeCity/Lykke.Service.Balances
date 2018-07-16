@@ -38,10 +38,5 @@ namespace Lykke.Service.Balances.AzureRepositories
             var entities = wallets.Select(item => WalletEntity.Create(walletId, item));
             await _tableStorage.InsertOrMergeBatchAsync(entities);
         }
-
-        public Task UpdateTotalBalancesAsync(IEnumerable<IWallet> totalBalances)
-        {
-            return _tableStorage.InsertOrMergeBatchAsync(totalBalances.Select(WalletEntity.CreateTotal));
-        }
     }
 }

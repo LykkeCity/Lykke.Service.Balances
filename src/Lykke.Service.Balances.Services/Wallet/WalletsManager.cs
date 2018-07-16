@@ -50,20 +50,20 @@ namespace Lykke.Service.Balances.Services.Wallet
             // NOTE: This is not atomic cache update. Due to this, service can't be scaled out.
             var wallets = new List<IWallet>();
             var tasks = new List<Task>();
-            
+
             foreach (var assetBalance in assetBalances)
             {
-                wallets.Add(new Core.Domain.Wallets.Wallet{AssetId = assetBalance.Asset, Balance = assetBalance.Balance, Reserved = assetBalance.Reserved});
+                wallets.Add(new Core.Domain.Wallets.Wallet { AssetId = assetBalance.Asset, Balance = assetBalance.Balance, Reserved = assetBalance.Reserved });
                 string key = GetAssetBalanceCacheKey(walletId, assetBalance.Asset);
-                
+
                 var cachedWallet = CachedWalletModel.Create(assetBalance.Asset, assetBalance.Balance, assetBalance.Reserved);
-                
+
                 tasks.Add(_cache.UpdateCacheAsync(key, cachedWallet, slidingExpiration: _cacheExpiration));
             }
 
             if (wallets.Any())
                 tasks.Add(_repository.UpdateBalanceAsync(walletId, wallets));
-            
+
             tasks.Add(_cache.RemoveAsync(GetAllBalancesCacheKey(walletId)));
 
             await Task.WhenAll(tasks);
@@ -88,29 +88,10 @@ namespace Lykke.Service.Balances.Services.Wallet
                 slidingExpiration: _cacheExpiration);
         }
 
-        public async Task UpdateTotalBalancesAsync(List<Core.Domain.Wallets.Wallet> totalBalances)
-        {
-            var tasks = new List<Task>();
-
-            foreach (var balance in totalBalances)
-            {
-                string key = GetTotalAssetBalanceCacheKey(balance.AssetId);
-                
-                var currentBalance = CachedWalletModel.Create(balance.AssetId, balance.Balance, balance.Reserved);
-                
-                tasks.Add(_cache.UpdateCacheAsync(key, currentBalance, slidingExpiration: _cacheExpiration));
-            }
-            
-            if (totalBalances.Any())
-                tasks.Add(_cache.RemoveAsync(GetTotalBalancesCacheKey()));
-            
-            await Task.WhenAll(tasks);
-        }
 
         private static string GetAllBalancesCacheKey(string clientId) => $":balances:{clientId}:all";
         private static string GetAssetBalanceCacheKey(string clientId, string assetId) => $":balances:{clientId}:{assetId}";
 
         private static string GetTotalBalancesCacheKey() => ":totalBalances";
-        private static string GetTotalAssetBalanceCacheKey(string assetId) => $":totalBalance:{assetId}";
     }
 }

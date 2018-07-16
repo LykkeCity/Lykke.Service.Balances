@@ -27,27 +27,5 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
                 Reserved = src.Reserved
             };
         }
-        
-        internal static WalletEntity CreateTotal(IWallet src)
-        {
-            return new WalletEntity
-            {
-                PartitionKey = GenerateTotalBalancePartitionKey(),
-                RowKey = GenerateRowKey(src.AssetId),
-                Balance = src.Balance,
-                Reserved = src.Reserved
-            };
-        }
-        
-        internal static WalletEntity Create(string walletId, string assetId, decimal balance, decimal reserved)
-        {
-            return new WalletEntity
-            {
-                PartitionKey = GeneratePartitionKey(walletId),
-                RowKey = GenerateRowKey(assetId),
-                Balance = balance,
-                Reserved = reserved
-            };
-        }
     }
 }
