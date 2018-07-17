@@ -4,7 +4,6 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
-using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -17,19 +16,19 @@ namespace Lykke.Service.Balances.Controllers
         private readonly ILog _log;
 
         public WalletCredentialController(
-                        IWalletCredentialsRepository walletCredentialsRepository,
-                        ILog log)
+            IWalletCredentialsRepository walletCredentialsRepository,
+            ILog log)
         {
             _walletCredentialsRepository = walletCredentialsRepository;
-            _log = log.CreateComponentScope(nameof(WalletCredentialController));
+            _log = log;
         }
 
         [HttpGet]
         [Route("getWalletsCredentials/{clientId}")]
         [SwaggerOperation("GetWalletsCredentials")]
-        [ProducesResponseType(typeof(IWalletCredentials), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IWalletCredentials), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetWalletsCredentials(string clientId)
         {
             try
@@ -43,9 +42,10 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, $"clientId = {clientId}", nameof(GetWalletsCredentials));
+                await _log.WriteErrorAsync(nameof(WalletCredentialController), nameof(GetWalletsCredentials),
+                    $"clientId = {clientId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials"));
+                return StatusCode((int)HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials"));
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
@@ -16,12 +17,18 @@ namespace Lykke.Service.Balances.Services.Wallet
         private readonly IDistributedCache _cache;
         private readonly IWalletsRepository _repository;
         private readonly TimeSpan _cacheExpiration;
+        private readonly ILog _log;
 
-        public CachedCachedWalletsRepository(IDistributedCache cache, IWalletsRepository repository, TimeSpan cacheExpiration)
+        public CachedCachedWalletsRepository(
+            [NotNull] IDistributedCache cache,
+            [NotNull] IWalletsRepository repository, 
+            TimeSpan cacheExpiration,
+            [NotNull] ILog log)
         {
-            _cache = cache;
-            _repository = repository;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _cacheExpiration = cacheExpiration;
+            _log = log.CreateComponentScope(nameof(CachedCachedWalletsRepository));
         }
 
         public async Task<IReadOnlyList<IWallet>> GetAllAsync(string walletId)
@@ -31,7 +38,8 @@ namespace Lykke.Service.Balances.Services.Wallet
                 async () => (await _repository.GetAsync(walletId))
                     .Select(CachedWalletModel.Copy)
                     .ToArray(),
-                slidingExpiration: _cacheExpiration);
+                slidingExpiration: _cacheExpiration,
+                log: _log);
         }
 
         public async Task<IWallet> GetAsync(string walletId, string assetId)
@@ -39,7 +47,8 @@ namespace Lykke.Service.Balances.Services.Wallet
             return await _cache.TryGetFromCacheAsync(
                 GetAssetBalanceCacheKey(walletId, assetId),
                 async () => CachedWalletModel.Copy(await _repository.GetAsync(walletId, assetId)),
-                slidingExpiration: _cacheExpiration);
+                slidingExpiration: _cacheExpiration,
+                log: _log);
         }
 
         public async Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved, long updateSequenceNumber)
@@ -49,16 +58,8 @@ namespace Lykke.Service.Balances.Services.Wallet
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet);
             if (updated)
             {
-                try
-                {
-                    var key = GetAssetBalanceCacheKey(walletId, assetId);
-                    await _cache.UpdateCacheAsync(key, wallet, slidingExpiration: _cacheExpiration);
-                }
-                catch (Exception e)
-                {
-                    // ignoring the errors
-                    // todo: implement fire-and-forget code by calling Redis library directly
-                }
+                var key = GetAssetBalanceCacheKey(walletId, assetId);
+                await _cache.TryUpdateCacheAsync(key, wallet, slidingExpiration: _cacheExpiration, log: _log);
             }
         }
 
@@ -74,7 +75,8 @@ namespace Lykke.Service.Balances.Services.Wallet
                 async () => (await _repository.GetTotalBalancesAsync())
                     .Select(CachedWalletModel.Copy)
                     .ToArray(),
-                slidingExpiration: _cacheExpiration);
+                slidingExpiration: _cacheExpiration,
+                log: _log);
         }
 
 

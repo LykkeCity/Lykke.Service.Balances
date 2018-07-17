@@ -51,7 +51,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             if (validationResult.Any())
             {
                 var error = $"Message will be skipped: {string.Join("\r\n", validationResult)}";
-                _log.Warning(error, null, message.ToJson());
+                _log.WriteWarning(nameof(ProcessMessageAsync), message.ToJson(), error);
 
                 return;
             }

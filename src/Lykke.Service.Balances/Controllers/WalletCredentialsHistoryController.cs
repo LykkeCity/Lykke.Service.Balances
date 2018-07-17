@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
-using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -19,18 +18,18 @@ namespace Lykke.Service.Balances.Controllers
 
         public WalletCredentialsHistoryController(
             IWalletCredentialsHistoryRepository walletCredentialsHistoryRepository,
-                        ILog log
-            )
+            ILog log
+        )
         {
             _walletCredentialsHistoryRepository = walletCredentialsHistoryRepository;
-            _log = log.CreateComponentScope(nameof(WalletCredentialsHistoryController));
+            _log = log;
         }
 
         [HttpGet]
         [Route("getWalletsCredentialsHistory/{clientId}")]
         [SwaggerOperation("GetWalletsCredentialsHistory")]
-        [ProducesResponseType(typeof(IEnumerable<string>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetWalletsCredentialsHistory(string clientId)
         {
             try
@@ -42,9 +41,10 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                _log.Error(ex, $"clientId = {clientId}", nameof(GetWalletsCredentialsHistory));
+                await _log.WriteErrorAsync(nameof(WalletCredentialsHistoryController),
+                    nameof(GetWalletsCredentialsHistory), $"clientId = {clientId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials history"));
+                return StatusCode((int)HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials history"));
             }
         }
     }

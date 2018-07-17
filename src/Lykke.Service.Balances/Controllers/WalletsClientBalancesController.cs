@@ -27,15 +27,15 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("{clientId}")]
         [SwaggerOperation("GetClientBalances")]
-        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetClientBalances(string clientId)
         {
             try
             {
                 var wallets = await _cachedWalletsRepository.GetAllAsync(clientId);
                 var result = wallets.Select(ClientBalanceResponseModel.Create);
-                   
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -43,7 +43,7 @@ namespace Lykke.Service.Balances.Controllers
                 await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
                     nameof(GetClientBalances), $"clientId = {clientId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError,
+                return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting client balances"));
             }
         }
@@ -51,9 +51,9 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("{clientId}/{assetId}")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
-        [ProducesResponseType(typeof(ClientBalanceResponseModel), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(ClientBalanceResponseModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetClientBalancesByAssetId(string clientId, string assetId)
         {
             try
@@ -70,17 +70,17 @@ namespace Lykke.Service.Balances.Controllers
                 await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
                     nameof(GetClientBalancesByAssetId), $"clientId = {clientId}, assetId = {assetId}", ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError,
+                return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting client balance by asset"));
             }
         }
-        
+
         [HttpGet]
         [Route("totalBalances")]
         [SwaggerOperation("GetTotalBalances")]
-        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int) HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ErrorResponse), (int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetTotalBalances()
         {
             try
@@ -98,7 +98,7 @@ namespace Lykke.Service.Balances.Controllers
                 await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
                     nameof(GetTotalBalances), null, ex);
 
-                return StatusCode((int) HttpStatusCode.InternalServerError,
+                return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting total balances"));
             }
         }
