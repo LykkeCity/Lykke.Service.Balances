@@ -4,11 +4,11 @@ using Lykke.Service.Balances.Core.Domain.Wallets;
 
 namespace Lykke.Service.Balances.Core.Services.Wallets
 {
-    public interface IWalletsManager
+    public interface ICachedWalletsRepository
     {
         Task<IReadOnlyList<IWallet>> GetAllAsync(string walletId);
         Task<IWallet> GetAsync(string walletId, string assetId);
-        Task UpdateBalanceAsync(string walletId, IEnumerable<(string Asset, decimal Balance, decimal Reserved)> assetBalances);
+        Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved, long updateSequenceNumber);
         Task CacheItAsync(string walletId);
         Task<IReadOnlyList<IWallet>> GetTotalBalancesAsync();
     }

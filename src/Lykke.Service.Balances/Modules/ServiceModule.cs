@@ -30,8 +30,8 @@ namespace Lykke.Service.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<WalletsManager>()
-                .As<IWalletsManager>()
+            builder.RegisterType<CachedCachedWalletsRepository>()
+                .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration));
 
             builder.Register(c => new RedisCache(new RedisCacheOptions

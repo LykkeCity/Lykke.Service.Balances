@@ -27,37 +27,37 @@ namespace Lykke.Job.Balances.Modules
             _dbSettings = appSettings.Nested(x => x.BalancesJob.Db);
             _log = log;
         }
-        
+
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<WalletsManager>()
-                .As<IWalletsManager>()
+            builder.RegisterType<CachedCachedWalletsRepository>()
+                .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.BalanceCache.Expiration));
 
             builder.Register(c => new RedisCache(new RedisCacheOptions
-                {
-                    Configuration = _appSettings.CurrentValue.BalancesJob.BalanceCache.Configuration,
-                    InstanceName = _appSettings.CurrentValue.BalancesJob.BalanceCache.Instance
-                }))
+            {
+                Configuration = _appSettings.CurrentValue.BalancesJob.BalanceCache.Configuration,
+                InstanceName = _appSettings.CurrentValue.BalancesJob.BalanceCache.Instance
+            }))
                 .As<IDistributedCache>()
                 .SingleInstance();
-            
+
             builder.RegisterInstance(
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
             ).As<IWalletsRepository>().SingleInstance();
 
-            builder.RegisterType<BalanceUpdateRabbitSubscriber>()
-                .As<IStartable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.BalanceRabbit.ConnectionString));
-
             builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit.ConnectionString));
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit));
+
+            builder.RegisterType<BalancesUpdateConsumer>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.MatchingEngineRabbit));
         }
     }
 }

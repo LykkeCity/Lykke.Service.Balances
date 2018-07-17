@@ -11,13 +11,13 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Lykke.Service.Balances.Services.Wallet
 {
     [UsedImplicitly]
-    public class WalletsManager : IWalletsManager
+    public class CachedCachedWalletsRepository : ICachedWalletsRepository
     {
         private readonly IDistributedCache _cache;
         private readonly IWalletsRepository _repository;
         private readonly TimeSpan _cacheExpiration;
 
-        public WalletsManager(IDistributedCache cache, IWalletsRepository repository, TimeSpan cacheExpiration)
+        public CachedCachedWalletsRepository(IDistributedCache cache, IWalletsRepository repository, TimeSpan cacheExpiration)
         {
             _cache = cache;
             _repository = repository;
@@ -42,40 +42,29 @@ namespace Lykke.Service.Balances.Services.Wallet
                 slidingExpiration: _cacheExpiration);
         }
 
-        /// <remarks>
-        /// Method calls with single <paramref name="walletId"/>, should be synchornized
-        /// </remarks>
-        public async Task UpdateBalanceAsync(string walletId, IEnumerable<(string Asset, decimal Balance, decimal Reserved)> assetBalances)
+        public async Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved, long updateSequenceNumber)
         {
-            // NOTE: This is not atomic cache update. Due to this, service can't be scaled out.
-            var wallets = new List<IWallet>();
-            var tasks = new List<Task>();
+            var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
 
-            foreach (var assetBalance in assetBalances)
+            var updated = await _repository.UpdateBalanceAsync(walletId, wallet);
+            if (updated)
             {
-                wallets.Add(new Core.Domain.Wallets.Wallet { AssetId = assetBalance.Asset, Balance = assetBalance.Balance, Reserved = assetBalance.Reserved });
-                string key = GetAssetBalanceCacheKey(walletId, assetBalance.Asset);
-
-                var cachedWallet = CachedWalletModel.Create(assetBalance.Asset, assetBalance.Balance, assetBalance.Reserved);
-
-                tasks.Add(_cache.UpdateCacheAsync(key, cachedWallet, slidingExpiration: _cacheExpiration));
+                try
+                {
+                    var key = GetAssetBalanceCacheKey(walletId, assetId);
+                    await _cache.UpdateCacheAsync(key, wallet, slidingExpiration: _cacheExpiration);
+                }
+                catch (Exception e)
+                {
+                    // ignoring the errors
+                    // todo: implement fire-and-forget code by calling Redis library directly
+                }
             }
-
-            if (wallets.Any())
-                tasks.Add(_repository.UpdateBalanceAsync(walletId, wallets));
-
-            tasks.Add(_cache.RemoveAsync(GetAllBalancesCacheKey(walletId)));
-
-            await Task.WhenAll(tasks);
         }
 
-        public async Task CacheItAsync(string walletId)
+        public Task CacheItAsync(string walletId)
         {
-            var storedValue = (await GetAllAsync(walletId))
-                .Select(CachedWalletModel.Copy)
-                .ToArray();
-
-            await _cache.UpdateCacheAsync(GetAllBalancesCacheKey(walletId), storedValue, slidingExpiration: _cacheExpiration);
+            return GetAllAsync(walletId);
         }
 
         public async Task<IReadOnlyList<IWallet>> GetTotalBalancesAsync()

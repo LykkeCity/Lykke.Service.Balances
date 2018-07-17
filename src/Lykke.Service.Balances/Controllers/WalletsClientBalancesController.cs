@@ -15,12 +15,12 @@ namespace Lykke.Service.Balances.Controllers
     [Route("api/[controller]")]
     public class WalletsClientBalancesController : Controller
     {
-        private readonly IWalletsManager _walletsManager;
+        private readonly ICachedWalletsRepository _cachedWalletsRepository;
         private readonly ILog _log;
 
-        public WalletsClientBalancesController(IWalletsManager walletsManager, ILog log)
+        public WalletsClientBalancesController(ICachedWalletsRepository cachedWalletsRepository, ILog log)
         {
-            _walletsManager = walletsManager;
+            _cachedWalletsRepository = cachedWalletsRepository;
             _log = log;
         }
 
@@ -33,7 +33,7 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var wallets = await _walletsManager.GetAllAsync(clientId);
+                var wallets = await _cachedWalletsRepository.GetAllAsync(clientId);
                 var result = wallets.Select(ClientBalanceResponseModel.Create);
                    
                 return Ok(result);
@@ -58,7 +58,7 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var wallet = await _walletsManager.GetAsync(clientId, assetId);
+                var wallet = await _cachedWalletsRepository.GetAsync(clientId, assetId);
 
                 if (wallet == null)
                     return NotFound();
@@ -85,7 +85,7 @@ namespace Lykke.Service.Balances.Controllers
         {
             try
             {
-                var balances = await _walletsManager.GetTotalBalancesAsync();
+                var balances = await _cachedWalletsRepository.GetTotalBalancesAsync();
 
                 if (balances == null)
                     return NotFound();
