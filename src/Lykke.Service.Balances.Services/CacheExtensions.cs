@@ -12,25 +12,25 @@ namespace Lykke.Service.Balances.Services
     {
         // TODO: Add update predicate
         // TODO: Make atomic
-        public static async Task<T> TryGetFromCacheAsync<T>(this IDistributedCache cache, 
+        public static async Task<T> TryGetAsync<T>(this IDistributedCache cache, 
             string key,
             Func<Task<T>> getRecordFunc, 
             TimeSpan? absoluteExpiration = null, 
             TimeSpan? slidingExpiration = null,
             ILog log = null)
         {
-            var record = await cache.TryGetFromCacheAsync<T>(key);
+            var record = await cache.TryGetAsync<T>(key);
 
             if (record == null)
             {
                 record = await getRecordFunc();
-                await cache.TryUpdateCacheAsync(key, record, absoluteExpiration, slidingExpiration, log);
+                await cache.TrySetAsync(key, record, absoluteExpiration, slidingExpiration, log);
             }
 
             return record;
         }
 
-        public static async Task<T> TryGetFromCacheAsync<T>(this IDistributedCache cache, 
+        public static async Task<T> TryGetAsync<T>(this IDistributedCache cache, 
             string key,
             ILog log = null)
         {
@@ -58,7 +58,7 @@ namespace Lykke.Service.Balances.Services
             return default(T);
         }
 
-        public static async Task<bool> TryUpdateCacheAsync<T>(this IDistributedCache cache, 
+        public static async Task<bool> TrySetAsync<T>(this IDistributedCache cache, 
             string key,
             T record, 
             TimeSpan? absoluteExpiration = null, 
@@ -74,6 +74,23 @@ namespace Lykke.Service.Balances.Services
                     AbsoluteExpirationRelativeToNow = absoluteExpiration,
                     SlidingExpiration = slidingExpiration
                 });
+                return true;
+            }
+            catch (StackExchange.Redis.RedisConnectionException ex)
+            {
+                // todo: use new logging contracts
+                log?.WriteWarning("", "", "Redis cache is not available", ex);
+                // ignoring the errors
+                return false;
+            }
+        }
+        public static async Task<bool> TryRemoveAsync(this IDistributedCache cache,
+            string key,
+            ILog log = null)
+        {
+            try
+            {
+                await cache.RemoveAsync(key);
                 return true;
             }
             catch (StackExchange.Redis.RedisConnectionException ex)
