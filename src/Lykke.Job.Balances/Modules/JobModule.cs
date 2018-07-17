@@ -47,7 +47,7 @@ namespace Lykke.Job.Balances.Modules
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
             ).As<IWalletsRepository>().SingleInstance();
 
-            builder.RegisterType<BalancesUpdateConsumer>()
+            builder.RegisterType<BalanceUpdateRabbitSubscriber>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()

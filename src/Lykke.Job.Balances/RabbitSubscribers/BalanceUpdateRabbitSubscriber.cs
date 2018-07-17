@@ -15,17 +15,17 @@ using Lykke.Service.Balances.Core.Services.Wallets;
 namespace Lykke.Job.Balances.RabbitSubscribers
 {
     [UsedImplicitly]
-    public class BalancesUpdateConsumer : IStartable, IStopable
+    public class BalanceUpdateRabbitSubscriber : IStartable, IStopable
     {
         private readonly ILog _log;
         private readonly RabbitMqSettings _rabbitMqSettings;
         private readonly ICqrsEngine _cqrsEngine;
         private readonly List<IStopable> _subscribers = new List<IStopable>();
-        
+
         private const string QueueName = "lykke.balances.updates";
         private const bool QueueDurable = true;
 
-        public BalancesUpdateConsumer(
+        public BalanceUpdateRabbitSubscriber(
             [NotNull] ICachedWalletsRepository cachedWalletsRepository,
             [NotNull] ILog log,
             [NotNull] RabbitMqSettings rabbitMqSettings,
@@ -66,7 +66,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
                 .SetLogger(_log)
                 .Start();
         }
-        
+
 
         private Task ProcessMessageAsync(CashInEvent message)
         {
@@ -85,7 +85,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
 
         private Task ProcessMessageAsync(ExecutionEvent message)
         {
-            if(message.BalanceUpdates == null)
+            if (message.BalanceUpdates == null)
                 return Task.CompletedTask;
 
             return UpdateBalances(message.Header, message.BalanceUpdates);
