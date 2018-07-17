@@ -47,17 +47,17 @@ namespace Lykke.Job.Balances.Modules
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
             ).As<IWalletsRepository>().SingleInstance();
 
-            builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
-                .As<IStartable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit));
-
             builder.RegisterType<BalancesUpdateConsumer>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.MatchingEngineRabbit));
+
+            builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit));
         }
     }
 }

@@ -59,7 +59,6 @@ namespace Lykke.Job.Balances.Modules
 
             builder.Register(ctx =>
             {
-                const string defaultPipeline = "commands";
                 const string defaultRoute = "self";
 
                 return new CqrsEngine(_log,
@@ -69,7 +68,7 @@ namespace Lykke.Job.Balances.Modules
                     true,
                     Register.DefaultEndpointResolver(new RabbitMqConventionEndpointResolver(
                         "RabbitMq",
-                        "messagepack",
+                        "protobuf",
                         environment: "lykke",
                         exclusiveQueuePostfix: "k8s")),
 
