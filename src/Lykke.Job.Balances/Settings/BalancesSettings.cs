@@ -10,5 +10,6 @@ namespace Lykke.Job.Balances.Settings
         public RedisSettings BalanceCache { get; set; }
         public RabbitMqSettings MatchingEngineRabbit { get; set; }
         public RabbitMqSettings AuthRabbit { get; set; }
+        public CqrsSettings Cqrs { get; set; }
     }
 }

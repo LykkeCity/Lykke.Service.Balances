@@ -5,6 +5,7 @@ using Autofac;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Cqrs;
 using Lykke.Job.Balances.Settings;
 using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
@@ -16,19 +17,23 @@ namespace Lykke.Job.Balances.RabbitSubscribers
     [UsedImplicitly]
     public class BalancesUpdateConsumer : IStartable, IStopable
     {
-        private readonly ICachedWalletsRepository _cachedWalletsRepository;
         private readonly ILog _log;
         private readonly RabbitMqSettings _rabbitMqSettings;
+        private readonly ICqrsEngine _cqrsEngine;
         private readonly List<IStopable> _subscribers = new List<IStopable>();
         
         private const string QueueName = "lykke.balances.updates";
         private const bool QueueDurable = true;
 
-        public BalancesUpdateConsumer(ICachedWalletsRepository cachedWalletsRepository, ILog log, RabbitMqSettings rabbitMqSettings)
+        public BalancesUpdateConsumer(
+            [NotNull] ICachedWalletsRepository cachedWalletsRepository,
+            [NotNull] ILog log,
+            [NotNull] RabbitMqSettings rabbitMqSettings,
+            [NotNull] ICqrsEngine cqrsEngine)
         {
-            _cachedWalletsRepository = cachedWalletsRepository;
-            _log = log;
-            _rabbitMqSettings = rabbitMqSettings;
+            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _rabbitMqSettings = rabbitMqSettings ?? throw new ArgumentNullException(nameof(rabbitMqSettings));
+            _cqrsEngine = cqrsEngine ?? throw new ArgumentNullException(nameof(cqrsEngine));
         }
 
         public void Start()
@@ -86,22 +91,21 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             return UpdateBalances(message.Header, message.BalanceUpdates);
         }
 
-        private async Task UpdateBalances(MatchingEngine.Connector.Models.Events.Common.Header header,
+        private Task UpdateBalances(MatchingEngine.Connector.Models.Events.Common.Header header,
             List<MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
         {
-            if (updates.Count == 0)
-                return;
-
-            foreach (var balance in updates)
+            foreach (var wallet in updates)
             {
-                // todo: use cqrs command to update balances
-                await _cachedWalletsRepository.UpdateBalanceAsync(
-                    balance.WalletId,
-                    balance.AssetId,
-                    decimal.Parse(balance.NewBalance),
-                    decimal.Parse(balance.NewReserved),
-                    header.SequenceNumber);
+                _cqrsEngine.PublishEvent(new BalanceUpdatedEvent
+                {
+                    WalletId = wallet.WalletId,
+                    AssetId = wallet.AssetId,
+                    Balance = wallet.NewBalance,
+                    Reserved = wallet.NewReserved,
+                    SequenceNumber = header.SequenceNumber
+                }, "balances");
             }
+            return Task.CompletedTask;
         }
 
         public void Dispose()
