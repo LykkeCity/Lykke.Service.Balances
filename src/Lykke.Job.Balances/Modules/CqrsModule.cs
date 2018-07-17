@@ -7,6 +7,7 @@ using Lykke.Cqrs.Configuration;
 using Lykke.Job.Balances.RabbitSubscribers;
 using Lykke.Job.Balances.Settings;
 using Lykke.Messaging;
+using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
 using Lykke.SettingsReader;
 
@@ -48,13 +49,17 @@ namespace Lykke.Job.Balances.Modules
 
             var rabbitMqSettings = new RabbitMQ.Client.ConnectionFactory { Uri = _settings.RabbitConnectionString };
 
-            var messagingEngine = new MessagingEngine(_log,
+            builder.RegisterInstance(new MessagingEngine(_log,
                 new TransportResolver(new Dictionary<string, TransportInfo>
                 {
-                    {"RabbitMq", new TransportInfo(rabbitMqSettings.Endpoint.ToString(), rabbitMqSettings.UserName, rabbitMqSettings.Password, "None", "RabbitMq")}
+                    {
+                        "RabbitMq",
+                        new TransportInfo(rabbitMqSettings.Endpoint.ToString(), rabbitMqSettings.UserName,
+                            rabbitMqSettings.Password, "None", "RabbitMq")
+                    }
                 }),
-                new RabbitMqTransportFactory());
-
+                new RabbitMqTransportFactory())).As<IMessagingEngine>().SingleInstance();
+            
             builder.RegisterType<BalancesUpdateProjection>();
 
             builder.Register(ctx =>
@@ -63,7 +68,7 @@ namespace Lykke.Job.Balances.Modules
 
                 return new CqrsEngine(_log,
                     ctx.Resolve<IDependencyResolver>(),
-                    messagingEngine,
+                    ctx.Resolve<IMessagingEngine>(),
                     new DefaultEndpointProvider(),
                     true,
                     Register.DefaultEndpointResolver(new RabbitMqConventionEndpointResolver(
