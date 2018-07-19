@@ -30,7 +30,7 @@ namespace Lykke.Service.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<CachedCachedWalletsRepository>()
+            builder.RegisterType<CachedWalletsRepository>()
                 .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration));
 
