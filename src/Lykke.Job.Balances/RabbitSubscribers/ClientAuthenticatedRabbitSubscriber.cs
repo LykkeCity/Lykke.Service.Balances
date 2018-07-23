@@ -5,6 +5,8 @@ using Autofac;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Log;
+using Lykke.Job.Balances.Settings;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
@@ -15,22 +17,24 @@ namespace Lykke.Job.Balances.RabbitSubscribers
     [UsedImplicitly]
     public class ClientAuthenticatedRabbitSubscriber : IStartable, IStopable
     {
-        private readonly IWalletsManager _walletsManager;
+        private readonly ICachedWalletsRepository _cachedWalletsRepository;
+        private readonly RabbitMqSettings _rabbitMqSettings;
         private readonly ILog _log;
-        private readonly string _connectionString;
-        private RabbitMqSubscriber<ClientAuthInfo> _subscriber;
+        private IStopable _subscriber;
 
-        public ClientAuthenticatedRabbitSubscriber(IWalletsManager walletsManager, ILog log, string connectionString)
+        private const string QueueName = "balances";
+
+        public ClientAuthenticatedRabbitSubscriber(ICachedWalletsRepository cachedWalletsRepository, ILog log, RabbitMqSettings rabbitMqSettings)
         {
-            _walletsManager = walletsManager;
-            _log = log;
-            _connectionString = connectionString;
+            _cachedWalletsRepository = cachedWalletsRepository;
+            _rabbitMqSettings = rabbitMqSettings;
+            _log = log.CreateComponentScope(nameof(ClientAuthenticatedRabbitSubscriber));
         }
 
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .CreateForSubscriber(_connectionString, "auth", "balances");
+                .CreateForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, QueueName);
 
             _subscriber = new RabbitMqSubscriber<ClientAuthInfo>(settings, new DefaultErrorHandlingStrategy(_log, settings))
                 .SetMessageDeserializer(new JsonMessageDeserializer<ClientAuthInfo>())
@@ -47,12 +51,12 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             if (validationResult.Any())
             {
                 var error = $"Message will be skipped: {string.Join("\r\n", validationResult)}";
-                await _log.WriteWarningAsync(nameof(BalanceUpdateRabbitSubscriber), nameof(ProcessMessageAsync), message.ToJson(), error);
+                _log.WriteWarning(nameof(ProcessMessageAsync), message.ToJson(), error);
 
                 return;
             }
 
-            await _walletsManager.CacheItAsync(message.ClientId);
+            await _cachedWalletsRepository.CacheItAsync(message.ClientId);
         }
 
         private static IReadOnlyList<string> ValidateMessage(ClientAuthInfo message)

@@ -27,21 +27,21 @@ namespace Lykke.Job.Balances.Modules
             _dbSettings = appSettings.Nested(x => x.BalancesJob.Db);
             _log = log;
         }
-        
+
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<WalletsManager>()
-                .As<IWalletsManager>()
+            builder.RegisterType<CachedWalletsRepository>()
+                .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.BalanceCache.Expiration));
 
             builder.Register(c => new RedisCache(new RedisCacheOptions
-                {
-                    Configuration = _appSettings.CurrentValue.BalancesJob.BalanceCache.Configuration,
-                    InstanceName = _appSettings.CurrentValue.BalancesJob.BalanceCache.Instance
-                }))
+            {
+                Configuration = _appSettings.CurrentValue.BalancesJob.BalanceCache.Configuration,
+                InstanceName = _appSettings.CurrentValue.BalancesJob.BalanceCache.Instance
+            }))
                 .As<IDistributedCache>()
                 .SingleInstance();
-            
+
             builder.RegisterInstance(
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
@@ -51,13 +51,13 @@ namespace Lykke.Job.Balances.Modules
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.BalanceRabbit.ConnectionString));
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.MatchingEngineRabbit));
 
             builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit.ConnectionString));
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit));
         }
     }
 }

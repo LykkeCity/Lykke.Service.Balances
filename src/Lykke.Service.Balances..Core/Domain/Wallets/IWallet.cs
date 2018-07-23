@@ -5,5 +5,6 @@
         decimal Balance { get; }
         decimal Reserved { get; }
         string AssetId { get; }
+        long? UpdateSequenceNumber { get; }
     }
 }

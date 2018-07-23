@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
-using Lykke.Job.Balances.RabbitSubscribers.IncommingMessages;
+using Lykke.Cqrs;
+using Lykke.Job.Balances.Settings;
+using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
@@ -16,112 +17,112 @@ namespace Lykke.Job.Balances.RabbitSubscribers
     [UsedImplicitly]
     public class BalanceUpdateRabbitSubscriber : IStartable, IStopable
     {
-        private readonly IWalletsManager _walletsManager;
         private readonly ILog _log;
-        private readonly string _connectionString;
-        private RabbitMqSubscriber<BalanceUpdatedEventProjection> _subscriber;
+        private readonly RabbitMqSettings _rabbitMqSettings;
+        private readonly ICqrsEngine _cqrsEngine;
+        private readonly List<IStopable> _subscribers = new List<IStopable>();
 
-        public BalanceUpdateRabbitSubscriber(IWalletsManager walletsManager, ILog log, string connectionString)
+        private const string QueueName = "lykke.balances.updates";
+        private const bool QueueDurable = true;
+
+        public BalanceUpdateRabbitSubscriber(
+            [NotNull] ICachedWalletsRepository cachedWalletsRepository,
+            [NotNull] ILog log,
+            [NotNull] RabbitMqSettings rabbitMqSettings,
+            [NotNull] ICqrsEngine cqrsEngine)
         {
-            _walletsManager = walletsManager;
-            _log = log;
-            _connectionString = connectionString;
+            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _rabbitMqSettings = rabbitMqSettings ?? throw new ArgumentNullException(nameof(rabbitMqSettings));
+            _cqrsEngine = cqrsEngine ?? throw new ArgumentNullException(nameof(cqrsEngine));
         }
 
         public void Start()
         {
-            var settings = RabbitMqSubscriptionSettings
-                .CreateForSubscriber(_connectionString, "balanceupdate", "balances")
-                .MakeDurable();
+            _subscribers.Add(Subscribe<CashInEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashIn, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<CashOutEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashOut, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<CashTransferEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashTransfer, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<ExecutionEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.Order, ProcessMessageAsync));
+        }
 
-            _subscriber = new RabbitMqSubscriber<BalanceUpdatedEventProjection>(settings,
+        private RabbitMqSubscriber<T> Subscribe<T>(MatchingEngine.Connector.Models.Events.Common.MessageType messageType, Func<T, Task> func)
+        {
+            var settings = new RabbitMqSubscriptionSettings
+            {
+                ConnectionString = _rabbitMqSettings.ConnectionString,
+                QueueName = $"{QueueName}.{messageType}",
+                ExchangeName = _rabbitMqSettings.Exchange,
+                RoutingKey = ((int)messageType).ToString(),
+                IsDurable = QueueDurable
+            };
+
+            return new RabbitMqSubscriber<T>(settings,
                     new ResilientErrorHandlingStrategy(_log, settings,
                         retryTimeout: TimeSpan.FromSeconds(10),
                         next: new DeadQueueErrorHandlingStrategy(_log, settings)))
-                .SetMessageDeserializer(new JsonMessageDeserializer<BalanceUpdatedEventProjection>())
+                .SetMessageDeserializer(new ProtoSerializer<T>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
-                .Subscribe(ProcessMessageAsync)
+                .Subscribe(func)
                 .CreateDefaultBinding()
                 .SetLogger(_log)
                 .Start();
         }
 
-        private async Task ProcessMessageAsync(BalanceUpdatedEventProjection message)
+
+        private Task ProcessMessageAsync(CashInEvent message)
         {
-            var validationResult = ValidateMessage(message);
-            
-            if (validationResult.Errors.Any())
-            {
-                var error = $"Message will be skipped: {string.Join("\r\n", validationResult.Errors)}";
-                await _log.WriteWarningAsync(nameof(BalanceUpdateRabbitSubscriber), nameof(ProcessMessageAsync), message.ToJson(), error);
-
-                return;
-            }
-
-            if (validationResult.Warnings.Any())
-            {
-                var warning = $"Message will be processed, but: {string.Join("\r\n", validationResult.Warnings)}";
-                await _log.WriteWarningAsync(nameof(BalanceUpdateRabbitSubscriber), nameof(ProcessMessageAsync), message.ToJson(), warning);
-            }
-
-            // Processes clients in parallel, but assets within single client sequentially
-            var tasks = message.Balances
-                .Where(b => b.ClientId != null && b.Asset != null)
-                .GroupBy(b => b.ClientId)
-                .Select(g => _walletsManager.UpdateBalanceAsync(
-                    g.Key, 
-                    g.Select(b => (Asset: b.Asset, Balance: (decimal)b.NewBalance, Reserved: (decimal)b.NewReserved)))).ToList();
-
-            await Task.WhenAll(tasks);
+            return UpdateBalances(message.Header, message.BalanceUpdates);
         }
 
-        private static (IReadOnlyList<string> Warnings, IReadOnlyList<string> Errors) ValidateMessage(BalanceUpdatedEventProjection message)
+        private Task ProcessMessageAsync(CashOutEvent message)
         {
-            var errors = new List<string>();
+            return UpdateBalances(message.Header, message.BalanceUpdates);
+        }
 
-            if (message == null)
+        private Task ProcessMessageAsync(CashTransferEvent message)
+        {
+            return UpdateBalances(message.Header, message.BalanceUpdates);
+        }
+
+        private Task ProcessMessageAsync(ExecutionEvent message)
+        {
+            if (message.BalanceUpdates == null)
+                return Task.CompletedTask;
+
+            return UpdateBalances(message.Header, message.BalanceUpdates);
+        }
+
+        private Task UpdateBalances(MatchingEngine.Connector.Models.Events.Common.Header header,
+            List<MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
+        {
+            foreach (var wallet in updates)
             {
-                errors.Add("message is null");
-            }
-            else
-            {
-                if (message.Balances == null || !message.Balances.Any())
+                _cqrsEngine.PublishEvent(new BalanceUpdatedEvent
                 {
-                    errors.Add("Balances are empty");
-                }
+                    WalletId = wallet.WalletId,
+                    AssetId = wallet.AssetId,
+                    Balance = wallet.NewBalance,
+                    Reserved = wallet.NewReserved,
+                    SequenceNumber = header.SequenceNumber
+                }, "balances");
             }
-
-            var warnings = new List<string>();
-
-            if (message?.Balances != null)
-            {
-                for (var i = 0; i < message.Balances.Count; ++i)
-                {
-                    var balance = message.Balances[i];
-
-                    if (balance.ClientId == null)
-                    {
-                        warnings.Add($"Balance {i} client id is empty");
-                    }
-
-                    if (balance.Asset == null)
-                    {
-                        warnings.Add($"Balance {i} asset is empty");
-                    }
-                }
-            }
-
-            return (warnings, errors);
+            return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            _subscriber?.Dispose();
+            foreach (var subscriber in _subscribers)
+            {
+                subscriber?.Dispose();
+            }
+
         }
 
         public void Stop()
         {
-            _subscriber?.Stop();
+            foreach (var subscriber in _subscribers)
+            {
+                subscriber?.Stop();
+            }
         }
     }
 }

@@ -8,5 +8,6 @@ namespace Lykke.Job.Balances.Settings
     {
         [AmqpCheck]
         public string ConnectionString { get; set; }
+        public string Exchange { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AzureStorage;
 using Lykke.Service.Balances.AzureRepositories.Account;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.Balances.Core.Domain.Wallets;
@@ -32,16 +31,12 @@ namespace Lykke.Service.Balances.AzureRepositories
         {
             return await _tableStorage.GetDataAsync(WalletEntity.GenerateTotalBalancePartitionKey());
         }
-
-        public async Task UpdateBalanceAsync(string walletId, List<IWallet> wallets)
+        
+        public Task<bool> UpdateBalanceAsync(string walletId, IWallet wallet)
         {
-            var entities = wallets.Select(item => WalletEntity.Create(walletId, item));
-            await _tableStorage.InsertOrMergeBatchAsync(entities);
-        }
-
-        public Task UpdateTotalBalancesAsync(IEnumerable<IWallet> totalBalances)
-        {
-            return _tableStorage.InsertOrMergeBatchAsync(totalBalances.Select(WalletEntity.CreateTotal));
+            var entity = WalletEntity.Create(walletId, wallet);
+            return _tableStorage.InsertOrReplaceAsync(entity,
+                x => x.UpdateSequenceNumber == null || x.UpdateSequenceNumber.Value < wallet.UpdateSequenceNumber.Value);
         }
     }
 }

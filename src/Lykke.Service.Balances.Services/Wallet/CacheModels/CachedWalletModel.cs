@@ -9,6 +9,7 @@ namespace Lykke.Service.Balances.Services.Wallet.CacheModels
         public decimal Balance { get; private set; }
         public string AssetId { get; private set; }
         public decimal Reserved { get; private set; }
+        public long? UpdateSequenceNumber { get; private set; }
 
         public static CachedWalletModel Copy(IWallet from)
         {
@@ -17,25 +18,21 @@ namespace Lykke.Service.Balances.Services.Wallet.CacheModels
                 {
                     Balance = from.Balance,
                     AssetId = from.AssetId,
-                    Reserved = from.Reserved
+                    Reserved = from.Reserved,
+                    UpdateSequenceNumber = from.UpdateSequenceNumber
                 }
                 : null;
         }
 
-        public static CachedWalletModel Create(string assetId, decimal balance, decimal reserved)
+        public static CachedWalletModel Create(string assetId, decimal balance, decimal reserved, long updateSequenceNumber)
         {
             return new CachedWalletModel
             {
                 Balance = balance,
                 AssetId = assetId,
-                Reserved = reserved
+                Reserved = reserved,
+                UpdateSequenceNumber = updateSequenceNumber
             };
-        }
-
-        public void Update(decimal balance, decimal reserved)
-        {
-            Balance = balance;
-            Reserved = reserved;
         }
     }
 }
