@@ -1,19 +1,16 @@
-﻿using Common.Log;
-using Lykke.Service.Balances.Client;
+﻿using Lykke.Service.Balances.Client;
 using Xunit;
 
 namespace Lykke.Service.Balances.Tests.WalletsCredentials
 {
     public class GetWalletsCredentialsInfo
     {
-        private readonly ILog _log = new LogToMemory();
         private const string ServiceUrl = "http://client-account.lykke-service.svc.cluster.local";
-
 
         [Fact(Skip = "integration test")]
         public async void GetWalletCredentialByClientId()
         {
-            var client = new BalancesClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl);
             var result = await (client.GetWalletCredential("35302a53-cacb-4052-b5c0-57f9c819495b"));
 
             Assert.NotNull(result);
@@ -23,7 +20,7 @@ namespace Lykke.Service.Balances.Tests.WalletsCredentials
         [Fact(Skip = "integration test")]
         public async void GetWalletCredentialHistoryByClientIdAndAssetId()
         {
-            var client = new BalancesClient(ServiceUrl, _log);
+            var client = new BalancesClient(ServiceUrl);
             var result = await (client.GetWalletCredentialHistory("35302a53-cacb-4052-b5c0-57f9c819495b"));
 
             Assert.NotNull(result);

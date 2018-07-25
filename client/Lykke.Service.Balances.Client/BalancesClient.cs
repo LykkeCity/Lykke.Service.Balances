@@ -1,5 +1,4 @@
-﻿using Common.Log;
-using Lykke.Service.Balances.Client.Models;
+﻿using Lykke.Service.Balances.Client.Models;
 using Lykke.Service.Balances.Client.ResponseModels;
 using System;
 using System.Collections.Generic;
@@ -14,13 +13,11 @@ namespace Lykke.Service.Balances.Client
     {
         private const string UexpectedApiResponse = "Unexpected Balances API response";
 
-        private readonly ILog _log;
         private IBalancesAPI _service;
 
-        public BalancesClient(string serviceUrl, ILog log)
+        public BalancesClient(string serviceUrl)
         {
             _service = new BalancesAPI(new Uri(serviceUrl), new HttpClient());
-            _log = log;
         }
 
         public async Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId)
