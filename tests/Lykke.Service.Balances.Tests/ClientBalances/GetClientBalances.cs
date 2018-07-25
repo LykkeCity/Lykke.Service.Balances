@@ -8,7 +8,7 @@ namespace Lykke.Service.Balances.Tests.ClientBalances
     {
         private const string ServiceUrl = "http://client-account.lykke-service.svc.cluster.local";
 
-        [Fact]
+        [Fact(Skip = "integration test")]
         public void GetClientBalancesByClientId()
         {
             var client = new BalancesClient(ServiceUrl);
@@ -17,7 +17,7 @@ namespace Lykke.Service.Balances.Tests.ClientBalances
             Assert.NotNull(result);
         }
 
-        [Fact]
+        [Fact(Skip = "integration test")]
         public void GetClientBalancesByClientIdAndAssetId()
         {
             var client = new BalancesClient(ServiceUrl);
