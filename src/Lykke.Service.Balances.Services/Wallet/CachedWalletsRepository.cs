@@ -56,12 +56,17 @@ namespace Lykke.Service.Balances.Services.Wallet
             var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
 
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet);
-            if (updated)
-            {
-                var key = GetAssetBalanceCacheKey(walletId, assetId);
-                await _cache.TrySetAsync(key, wallet, slidingExpiration: _cacheExpiration, log: _log);
-                await _cache.TryRemoveAsync(GetAllBalancesCacheKey(walletId));
-            }
+            if (!updated)
+                return;
+
+            var key = GetAssetBalanceCacheKey(walletId, assetId);
+            await _cache.TrySetAsync(key, wallet, slidingExpiration: _cacheExpiration, log: _log);
+            await _cache.TryRemoveAsync(GetAllBalancesCacheKey(walletId));
+
+            var totalAssetWallet = await GetTotalBalanceAsync(assetId);
+            var totalKey = GetTotalBalanceCacheKey(assetId);
+            totalAssetWallet = totalAssetWallet.Update(balance, reserved);
+            await _cache.TrySetAsync(totalKey, totalAssetWallet, slidingExpiration: _cacheExpiration, log: _log);
         }
 
         public Task CacheItAsync(string walletId)
@@ -80,10 +85,19 @@ namespace Lykke.Service.Balances.Services.Wallet
                 log: _log);
         }
 
+        public async Task<IWallet> GetTotalBalanceAsync(string assetId)
+        {
+            return await _cache.TryGetAsync(
+                GetTotalBalanceCacheKey(assetId),
+                async () => CachedWalletModel.Copy(await _repository.GetTotalBalanceAsync(assetId)),
+                slidingExpiration: _cacheExpiration,
+                log: _log);
+        }
 
         private static string GetAllBalancesCacheKey(string walletId) => $":balances:{walletId}:all";
         private static string GetAssetBalanceCacheKey(string walletId, string assetId) => $":balances:{walletId}:{assetId}";
 
         private static string GetTotalBalancesCacheKey() => ":totalBalances";
+        private static string GetTotalBalanceCacheKey(string assetId) => $":totalBalances:{assetId}";
     }
 }
