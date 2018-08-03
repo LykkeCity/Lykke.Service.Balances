@@ -29,5 +29,16 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
                 UpdateSequenceNumber = src.UpdateSequenceNumber
             };
         }
+
+        public IWallet Update(decimal newBalance, decimal newReserved)
+        {
+            return new WalletEntity
+            {
+                PartitionKey = PartitionKey,
+                RowKey = RowKey,
+                Balance = newBalance,
+                Reserved = newReserved,
+            };
+        }
     }
 }

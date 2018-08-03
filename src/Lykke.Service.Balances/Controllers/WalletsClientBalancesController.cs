@@ -100,5 +100,31 @@ namespace Lykke.Service.Balances.Controllers
                     ErrorResponse.Create("Error occured while getting total balances"));
             }
         }
+
+        [HttpPost]
+        [Route("totalBalance/{assetId}")]
+        [SwaggerOperation("GetTotalBalance")]
+        [ProducesResponseType(typeof(ClientBalanceResponseModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTotalBalance(string assetId)
+        {
+            try
+            {
+                var balance = await _cachedWalletsRepository.GetTotalBalanceAsync(assetId);
+
+                if (balance == null)
+                    return NotFound();
+
+                return Ok(ClientBalanceResponseModel.Create(balance));
+            }
+            catch (Exception ex)
+            {
+                _log.WriteError(nameof(WalletsClientBalancesController), nameof(GetTotalBalances), ex);
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting total balances"));
+            }
+        }
+
     }
 }
