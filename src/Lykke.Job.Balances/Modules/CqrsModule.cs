@@ -73,7 +73,7 @@ namespace Lykke.Job.Balances.Modules
                     true,
                     Register.DefaultEndpointResolver(new RabbitMqConventionEndpointResolver(
                         "RabbitMq",
-                        "protobuf",
+                        Messaging.Serialization.SerializationFormat.ProtoBuf,
                         environment: "lykke",
                         exclusiveQueuePostfix: "k8s")),
 
