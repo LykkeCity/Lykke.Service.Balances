@@ -9,6 +9,7 @@ using Lykke.Cqrs;
 using Lykke.Job.Balances.Settings;
 using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
+using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
 
@@ -64,6 +65,8 @@ namespace Lykke.Job.Balances.RabbitSubscribers
                 .Subscribe(func)
                 .CreateDefaultBinding()
                 .SetLogger(_log)
+                .SetAlternativeExchange(_rabbitMqSettings.AlternateConnectionString)
+                .SetDeduplicator(new InMemoryDeduplcator(TimeSpan.FromDays(1)))
                 .Start();
         }
 
