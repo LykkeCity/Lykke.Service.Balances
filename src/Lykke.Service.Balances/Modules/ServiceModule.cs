@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
-using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.AzureRepositories.Account;
 using Lykke.Service.Balances.AzureRepositories.Wallets;
@@ -19,13 +19,11 @@ namespace Lykke.Service.Balances.Modules
     {
         private readonly IReloadingManager<AppSettings> _appSettings;
         private readonly IReloadingManager<DbSettings> _dbSettings;
-        private readonly ILog _log;
 
-        public ServiceModule(IReloadingManager<AppSettings> appSettings, ILog log)
+        public ServiceModule(IReloadingManager<AppSettings> appSettings)
         {
             _appSettings = appSettings;
             _dbSettings = _appSettings.Nested(x => x.BalancesService.Db);
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -42,19 +40,19 @@ namespace Lykke.Service.Balances.Modules
                 .As<IDistributedCache>()
                 .SingleInstance();
             
-            builder.RegisterInstance(
+            builder.Register(ctx => 
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
-                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
+                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", ctx.Resolve<ILogFactory>()))
             ).As<IWalletsRepository>().SingleInstance();
-            
-            builder.RegisterInstance(
+
+            builder.Register(ctx =>
                 new WalletCredentialsRepository(AzureTableStorage<WalletCredentialsEntity>.Create(
-                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentials", _log))
+                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentials", ctx.Resolve<ILogFactory>()))
             ).As<IWalletCredentialsRepository>().SingleInstance();
-            
-            builder.RegisterInstance(
+
+            builder.Register(ctx =>
                 new WalletCredentialsHistoryRepository(AzureTableStorage<WalletCredentialsHistoryRecord>.Create(
-                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentialsHistory", _log))
+                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentialsHistory", ctx.Resolve<ILogFactory>()))
             ).As<IWalletCredentialsHistoryRepository>().SingleInstance();
         }
     }

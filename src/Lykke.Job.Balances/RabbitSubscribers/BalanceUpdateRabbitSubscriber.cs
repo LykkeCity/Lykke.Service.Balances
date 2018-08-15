@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using Common;
-using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.Balances.Settings;
 using Lykke.MatchingEngine.Connector.Models.Events;
@@ -18,7 +18,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
     [UsedImplicitly]
     public class BalanceUpdateRabbitSubscriber : IStartable, IStopable
     {
-        private readonly ILog _log;
+        [NotNull] private readonly ILogFactory _logFactory;
         private readonly RabbitMqSettings _rabbitMqSettings;
         private readonly ICqrsEngine _cqrsEngine;
         private readonly List<IStopable> _subscribers = new List<IStopable>();
@@ -28,11 +28,11 @@ namespace Lykke.Job.Balances.RabbitSubscribers
 
         public BalanceUpdateRabbitSubscriber(
             [NotNull] ICachedWalletsRepository cachedWalletsRepository,
-            [NotNull] ILog log,
+            [NotNull] ILogFactory logFactory,
             [NotNull] RabbitMqSettings rabbitMqSettings,
             [NotNull] ICqrsEngine cqrsEngine)
         {
-            _log = log ?? throw new ArgumentNullException(nameof(log));
+            _logFactory = logFactory;
             _rabbitMqSettings = rabbitMqSettings ?? throw new ArgumentNullException(nameof(rabbitMqSettings));
             _cqrsEngine = cqrsEngine ?? throw new ArgumentNullException(nameof(cqrsEngine));
         }
@@ -56,15 +56,16 @@ namespace Lykke.Job.Balances.RabbitSubscribers
                 IsDurable = QueueDurable
             };
 
-            return new RabbitMqSubscriber<T>(settings,
-                    new ResilientErrorHandlingStrategy(_log, settings,
+            return new RabbitMqSubscriber<T>(
+                    _logFactory, 
+                    settings,
+                    new ResilientErrorHandlingStrategy(_logFactory, settings,
                         retryTimeout: TimeSpan.FromSeconds(10),
-                        next: new DeadQueueErrorHandlingStrategy(_log, settings)))
+                        next: new DeadQueueErrorHandlingStrategy(_logFactory, settings)))
                 .SetMessageDeserializer(new ProtoSerializer<T>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(func)
                 .CreateDefaultBinding()
-                .SetLogger(_log)
                 .SetAlternativeExchange(_rabbitMqSettings.AlternateConnectionString)
                 .SetDeduplicator(new InMemoryDeduplcator(TimeSpan.FromDays(1)))
                 .Start();

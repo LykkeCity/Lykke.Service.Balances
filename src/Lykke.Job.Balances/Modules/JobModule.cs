@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
-using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Job.Balances.RabbitSubscribers;
 using Lykke.Job.Balances.Settings;
 using Lykke.Service.Balances.AzureRepositories;
@@ -19,13 +19,11 @@ namespace Lykke.Job.Balances.Modules
     {
         private readonly IReloadingManager<AppSettings> _appSettings;
         private readonly IReloadingManager<DbSettings> _dbSettings;
-        private readonly ILog _log;
 
-        public JobModule(IReloadingManager<AppSettings> appSettings, ILog log)
+        public JobModule(IReloadingManager<AppSettings> appSettings)
         {
             _appSettings = appSettings;
             _dbSettings = appSettings.Nested(x => x.BalancesJob.Db);
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -42,9 +40,9 @@ namespace Lykke.Job.Balances.Modules
                 .As<IDistributedCache>()
                 .SingleInstance();
 
-            builder.RegisterInstance(
+            builder.Register(ctx =>
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
-                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", _log))
+                    _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", ctx.Resolve<ILogFactory>()))
             ).As<IWalletsRepository>().SingleInstance();
 
             builder.RegisterType<BalanceUpdateRabbitSubscriber>()
