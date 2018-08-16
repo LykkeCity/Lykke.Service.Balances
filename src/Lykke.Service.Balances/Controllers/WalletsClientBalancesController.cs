@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -18,10 +19,10 @@ namespace Lykke.Service.Balances.Controllers
         private readonly ICachedWalletsRepository _cachedWalletsRepository;
         private readonly ILog _log;
 
-        public WalletsClientBalancesController(ICachedWalletsRepository cachedWalletsRepository, ILog log)
+        public WalletsClientBalancesController(ICachedWalletsRepository cachedWalletsRepository, ILogFactory logFactory)
         {
             _cachedWalletsRepository = cachedWalletsRepository;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         [HttpGet]
@@ -40,8 +41,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
-                    nameof(GetClientBalances), $"clientId = {clientId}", ex);
+                _log.Error(nameof(GetClientBalances), ex, $"clientId = {clientId}");
 
                 return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting client balances"));
@@ -67,8 +67,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
-                    nameof(GetClientBalancesByAssetId), $"clientId = {clientId}, assetId = {assetId}", ex);
+                _log.Error(nameof(GetClientBalancesByAssetId), ex, $"clientId = {clientId}, assetId = {assetId}");
 
                 return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting client balance by asset"));
@@ -95,8 +94,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletsClientBalancesController),
-                    nameof(GetTotalBalances), null, ex);
+                _log.Error(nameof(GetTotalBalances), ex);
 
                 return StatusCode((int)HttpStatusCode.InternalServerError,
                     ErrorResponse.Create("Error occured while getting total balances"));

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Services.Wallet.CacheModels;
@@ -23,12 +24,12 @@ namespace Lykke.Service.Balances.Services.Wallet
             [NotNull] IDistributedCache cache,
             [NotNull] IWalletsRepository repository, 
             TimeSpan cacheExpiration,
-            [NotNull] ILog log)
+            [NotNull] ILogFactory logFactory)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _cacheExpiration = cacheExpiration;
-            _log = log.CreateComponentScope(nameof(CachedWalletsRepository));
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IReadOnlyList<IWallet>> GetAllAsync(string walletId)

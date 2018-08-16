@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Common.Log;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Caching.Distributed;
@@ -41,8 +42,7 @@ namespace Lykke.Service.Balances.Services
             }
             catch (StackExchange.Redis.RedisConnectionException ex)
             {
-                // todo: use new logging contracts
-                log?.WriteWarning("", "", "Redis cache is not available", ex);
+                log?.Warning("Redis cache is not available", ex);
                 // ignoring the errors
                 return default(T);
             }
@@ -78,8 +78,7 @@ namespace Lykke.Service.Balances.Services
             }
             catch (StackExchange.Redis.RedisConnectionException ex)
             {
-                // todo: use new logging contracts
-                log?.WriteWarning("", "", "Redis cache is not available", ex);
+                log?.Warning("Redis cache is not available", ex);
                 // ignoring the errors
                 return false;
             }
@@ -95,8 +94,7 @@ namespace Lykke.Service.Balances.Services
             }
             catch (StackExchange.Redis.RedisConnectionException ex)
             {
-                // todo: use new logging contracts
-                log?.WriteWarning("", "", "Redis cache is not available", ex);
+                log?.Warning("Redis cache is not available", ex);
                 // ignoring the errors
                 return false;
             }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Autofac;
-using Common.Log;
 using Lykke.Common.Chaos;
+using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
 using Lykke.Job.Balances.RabbitSubscribers;
@@ -16,12 +16,10 @@ namespace Lykke.Job.Balances.Modules
     public class CqrsModule : Module
     {
         private readonly CqrsSettings _settings;
-        private readonly ILog _log;
 
-        public CqrsModule(IReloadingManager<AppSettings> settingsManager, ILog log)
+        public CqrsModule(IReloadingManager<AppSettings> settingsManager)
         {
             _settings = settingsManager.CurrentValue.BalancesJob.Cqrs;
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -49,7 +47,7 @@ namespace Lykke.Job.Balances.Modules
 
             var rabbitMqSettings = new RabbitMQ.Client.ConnectionFactory { Uri = _settings.RabbitConnectionString };
 
-            builder.RegisterInstance(new MessagingEngine(_log,
+            builder.Register(ctx => new MessagingEngine(ctx.Resolve<ILogFactory>(),
                 new TransportResolver(new Dictionary<string, TransportInfo>
                 {
                     {
@@ -58,7 +56,7 @@ namespace Lykke.Job.Balances.Modules
                             rabbitMqSettings.Password, "None", "RabbitMq")
                     }
                 }),
-                new RabbitMqTransportFactory())).As<IMessagingEngine>().SingleInstance();
+                new RabbitMqTransportFactory(ctx.Resolve<ILogFactory>()))).As<IMessagingEngine>().SingleInstance();
             
             builder.RegisterType<BalancesUpdateProjection>();
 
@@ -66,14 +64,14 @@ namespace Lykke.Job.Balances.Modules
             {
                 const string defaultRoute = "self";
 
-                return new CqrsEngine(_log,
+                return new CqrsEngine(ctx.Resolve<ILogFactory>(),
                     ctx.Resolve<IDependencyResolver>(),
                     ctx.Resolve<IMessagingEngine>(),
                     new DefaultEndpointProvider(),
                     true,
                     Register.DefaultEndpointResolver(new RabbitMqConventionEndpointResolver(
                         "RabbitMq",
-                        "protobuf",
+                        Messaging.Serialization.SerializationFormat.ProtoBuf,
                         environment: "lykke",
                         exclusiveQueuePostfix: "k8s")),
 

@@ -6,7 +6,7 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="7.0.1" />
+    <PackageReference Include="Lykke.Common" Version="7.0.3" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.1" />
   </ItemGroup>

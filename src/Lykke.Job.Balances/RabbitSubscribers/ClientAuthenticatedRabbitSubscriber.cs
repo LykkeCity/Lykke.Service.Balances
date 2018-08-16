@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
@@ -18,17 +19,22 @@ namespace Lykke.Job.Balances.RabbitSubscribers
     public class ClientAuthenticatedRabbitSubscriber : IStartable, IStopable
     {
         private readonly ICachedWalletsRepository _cachedWalletsRepository;
-        private readonly RabbitMqSettings _rabbitMqSettings;
         private readonly ILog _log;
+        private readonly ILogFactory _logFactory;
+        private readonly RabbitMqSettings _rabbitMqSettings;
         private IStopable _subscriber;
 
         private const string QueueName = "balances";
 
-        public ClientAuthenticatedRabbitSubscriber(ICachedWalletsRepository cachedWalletsRepository, ILog log, RabbitMqSettings rabbitMqSettings)
+        public ClientAuthenticatedRabbitSubscriber(
+            [NotNull] ICachedWalletsRepository cachedWalletsRepository,
+            [NotNull] ILogFactory logFactory,
+            [NotNull] RabbitMqSettings rabbitMqSettings)
         {
-            _cachedWalletsRepository = cachedWalletsRepository;
-            _rabbitMqSettings = rabbitMqSettings;
-            _log = log.CreateComponentScope(nameof(ClientAuthenticatedRabbitSubscriber));
+            _cachedWalletsRepository = cachedWalletsRepository ?? throw new ArgumentNullException(nameof(cachedWalletsRepository));
+            _logFactory = logFactory ?? throw new ArgumentNullException(nameof(logFactory));
+            _rabbitMqSettings = rabbitMqSettings ?? throw new ArgumentNullException(nameof(rabbitMqSettings));
+            _log = logFactory.CreateLog(this);
         }
 
         public void Start()
@@ -36,12 +42,14 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             var settings = RabbitMqSubscriptionSettings
                 .CreateForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, QueueName);
 
-            _subscriber = new RabbitMqSubscriber<ClientAuthInfo>(settings, new DefaultErrorHandlingStrategy(_log, settings))
+            _subscriber = new RabbitMqSubscriber<ClientAuthInfo>(
+                    _logFactory,
+                    settings, 
+                    new DefaultErrorHandlingStrategy(_logFactory, settings))
                 .SetMessageDeserializer(new JsonMessageDeserializer<ClientAuthInfo>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
                 .CreateDefaultBinding()
-                .SetLogger(_log)
                 .Start();
         }
 
@@ -51,7 +59,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             if (validationResult.Any())
             {
                 var error = $"Message will be skipped: {string.Join("\r\n", validationResult)}";
-                _log.WriteWarning(nameof(ProcessMessageAsync), message.ToJson(), error);
+                _log.Warning(error, context: message.ToJson());
 
                 return;
             }

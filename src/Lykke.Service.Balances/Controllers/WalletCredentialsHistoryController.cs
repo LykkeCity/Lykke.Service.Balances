@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Lykke.Common.Api.Contract.Responses;
+using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -18,11 +19,11 @@ namespace Lykke.Service.Balances.Controllers
 
         public WalletCredentialsHistoryController(
             IWalletCredentialsHistoryRepository walletCredentialsHistoryRepository,
-            ILog log
+            ILogFactory logFactory
         )
         {
             _walletCredentialsHistoryRepository = walletCredentialsHistoryRepository;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         [HttpGet]
@@ -41,8 +42,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(nameof(WalletCredentialsHistoryController),
-                    nameof(GetWalletsCredentialsHistory), $"clientId = {clientId}", ex);
+                _log.Error(nameof(GetWalletsCredentialsHistory), ex, $"clientId = {clientId}");
 
                 return StatusCode((int)HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting wallet credentials history"));
             }
