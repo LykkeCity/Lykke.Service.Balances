@@ -54,8 +54,9 @@ namespace Lykke.Service.Balances.Services.Wallet
 
         public async Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved, long updateSequenceNumber)
         {
-            var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
+            var oldWallet = await _repository.GetAsync(walletId, assetId);
 
+            var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet);
             if (!updated)
                 return;
@@ -65,9 +66,18 @@ namespace Lykke.Service.Balances.Services.Wallet
             await _cache.TryRemoveAsync(GetAllBalancesCacheKey(walletId));
 
             var totalAssetWallet = await GetTotalBalanceAsync(assetId);
-            var totalKey = GetTotalBalanceCacheKey(assetId);
-            totalAssetWallet = totalAssetWallet.Update(balance, reserved);
-            await _cache.TrySetAsync(totalKey, totalAssetWallet, slidingExpiration: _cacheExpiration, log: _log);
+            decimal oldBalance = oldWallet?.Balance ?? 0;
+            decimal oldReserved = oldWallet?.Reserved ?? 0;
+            var cachedModel = CachedWalletModel.Create(
+                assetId,
+                totalAssetWallet.Balance + balance - oldBalance,
+                totalAssetWallet.Reserved + reserved - oldReserved,
+                updateSequenceNumber);
+            await _cache.TrySetAsync(
+                GetTotalBalanceCacheKey(assetId),
+                cachedModel,
+                slidingExpiration: _cacheExpiration,
+                log: _log);
         }
 
         public Task CacheItAsync(string walletId)

@@ -6,7 +6,5 @@
         decimal Reserved { get; }
         string AssetId { get; }
         long? UpdateSequenceNumber { get; }
-
-        IWallet Update(decimal newBalance, decimal newReserved);
     }
 }

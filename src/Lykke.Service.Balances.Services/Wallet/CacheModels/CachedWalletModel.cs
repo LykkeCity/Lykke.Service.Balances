@@ -34,15 +34,5 @@ namespace Lykke.Service.Balances.Services.Wallet.CacheModels
                 UpdateSequenceNumber = updateSequenceNumber
             };
         }
-
-        public IWallet Update(decimal newBalance, decimal newReserved)
-        {
-            return new CachedWalletModel
-            {
-                Balance = newBalance,
-                AssetId = AssetId,
-                Reserved = newReserved,
-            };
-        }
     }
 }
