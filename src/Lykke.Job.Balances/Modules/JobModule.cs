@@ -1,8 +1,10 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using AzureStorage.Tables;
 using Lykke.Common.Log;
 using Lykke.Job.Balances.RabbitSubscribers;
 using Lykke.Job.Balances.Settings;
+using Lykke.Service.Assets.Client;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.AzureRepositories.Account;
 using Lykke.Service.Balances.Core.Domain.Wallets;
@@ -28,17 +30,21 @@ namespace Lykke.Job.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            var settings = _appSettings.CurrentValue;
+
             builder.RegisterType<CachedWalletsRepository>()
                 .As<ICachedWalletsRepository>()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.BalanceCache.Expiration));
+                .WithParameter(TypedParameter.From(settings.BalancesJob.BalanceCache.Expiration));
 
             builder.Register(c => new RedisCache(new RedisCacheOptions
             {
-                Configuration = _appSettings.CurrentValue.BalancesJob.BalanceCache.Configuration,
-                InstanceName = _appSettings.CurrentValue.BalancesJob.BalanceCache.Instance
+                Configuration = settings.BalancesJob.BalanceCache.Configuration,
+                InstanceName = settings.BalancesJob.BalanceCache.Instance
             }))
                 .As<IDistributedCache>()
                 .SingleInstance();
+
+            builder.RegisterAssetsClient(AssetServiceSettings.Create(new Uri(settings.AssetsServiceClient.ServiceUrl), TimeSpan.FromMinutes(5)));
 
             builder.Register(ctx =>
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
@@ -49,13 +55,18 @@ namespace Lykke.Job.Balances.Modules
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.MatchingEngineRabbit));
+                .WithParameter(TypedParameter.From(settings.BalancesJob.MatchingEngineRabbit));
 
             builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesJob.AuthRabbit));
+                .WithParameter(TypedParameter.From(settings.BalancesJob.AuthRabbit));
+
+            builder.RegisterType<TotalBalanceCacheUpdater>()
+                .As<ITotalBalanceCacheUpdater>()
+                .As<IStartable>()
+                .SingleInstance();
         }
     }
 }
