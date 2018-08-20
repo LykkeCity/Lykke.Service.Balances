@@ -92,7 +92,7 @@ namespace Lykke.Service.Balances.Services.Wallet
         public async Task UpdateTotalBalancesAsync(IEnumerable<string> assetIds)
         {
             var wallets = assetIds
-                .Select(async a => await GetTotalBalanceAsync(a))
+                .Select(async a => CachedWalletModel.Copy(await GetTotalBalanceAsync(a)))
                 .ToList();
 
             await _cache.TrySetAsync(GetTotalBalancesCacheKey(), wallets);
