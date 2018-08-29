@@ -1,9 +1,9 @@
 ﻿using Lykke.AzureStorage.Tables;
 using Lykke.AzureStorage.Tables.Entity.Annotation;
 using Lykke.AzureStorage.Tables.Entity.ValueTypesMerging;
-using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Domain;
 
-namespace Lykke.Service.Balances.AzureRepositories.Account
+namespace Lykke.Service.Balances.AzureRepositories
 {
     [ValueTypeMergingStrategy(ValueTypeMergingStrategy.UpdateAlways)]
     public class WalletEntity : AzureTableEntity, IWallet
@@ -15,10 +15,9 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
         public long? UpdateSequenceNumber { get; set; }
 
         internal static string GeneratePartitionKey(string walletId) => walletId;
-        internal static string GenerateTotalBalancePartitionKey() => "TotalBalance";
         internal static string GenerateRowKey(string assetId) => assetId;
 
-        internal static WalletEntity Create(string walletId, IWallet src)
+        internal static WalletEntity Create(string walletId, IWallet src, long updateSequenceNumber)
         {
             return new WalletEntity
             {
@@ -26,7 +25,7 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
                 RowKey = GenerateRowKey(src.AssetId),
                 Balance = src.Balance,
                 Reserved = src.Reserved,
-                UpdateSequenceNumber = src.UpdateSequenceNumber
+                UpdateSequenceNumber = updateSequenceNumber
             };
         }
     }

@@ -10,6 +10,6 @@ namespace Lykke.Service.Balances.Workflow.Commands
         [ProtoMember(2)]
         public string AssetId { get; set; }
         [ProtoMember(3)]
-        public decimal DeltaBalance { get; set; }
+        public decimal BalanceDelta { get; set; }
     }
 }

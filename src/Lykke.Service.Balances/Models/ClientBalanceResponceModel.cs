@@ -1,8 +1,8 @@
-﻿using Lykke.Service.Balances.Core.Domain.Wallets;
+﻿using Lykke.Service.Balances.Core.Domain;
 
 namespace Lykke.Service.Balances.Models
 {
-    public class ClientBalanceResponseModel
+    public class ClientBalanceModel
     {
         // todo: add WalletId
         //public string WalletId { get; set; }
@@ -10,9 +10,9 @@ namespace Lykke.Service.Balances.Models
         public decimal Balance { get; set; }
         public decimal Reserved { get; set; }
 
-        public static ClientBalanceResponseModel Create(IWallet src)
+        public static ClientBalanceModel Create(IWallet src)
         {
-            return new ClientBalanceResponseModel
+            return new ClientBalanceModel
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance,

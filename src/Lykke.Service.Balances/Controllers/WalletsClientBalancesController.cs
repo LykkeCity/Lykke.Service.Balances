@@ -25,11 +25,11 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("{clientId}")]
         [SwaggerOperation("GetClientBalances")]
-        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ClientBalanceModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetClientBalances(string clientId)
         {
             var wallets = await _cachedWalletsRepository.GetAllAsync(clientId);
-            var result = wallets.Select(ClientBalanceResponseModel.Create);
+            var result = wallets.Select(ClientBalanceModel.Create);
 
             return Ok(result);
         }
@@ -37,7 +37,7 @@ namespace Lykke.Service.Balances.Controllers
         [HttpGet]
         [Route("{clientId}/{assetId}")]
         [SwaggerOperation("GetClientBalancesByAssetId")]
-        [ProducesResponseType(typeof(ClientBalanceResponseModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ClientBalanceModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetClientBalancesByAssetId(string clientId, string assetId)
         {
@@ -46,13 +46,13 @@ namespace Lykke.Service.Balances.Controllers
             if (wallet == null)
                 return NotFound();
 
-            return Ok(ClientBalanceResponseModel.Create(wallet));
+            return Ok(ClientBalanceModel.Create(wallet));
         }
 
         [HttpGet]
         [Route("totalBalances")]
         [SwaggerOperation("GetTotalBalances")]
-        [ProducesResponseType(typeof(IEnumerable<TotalBalanceModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<TotalAssetBalanceModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetTotalBalances()
         {
@@ -61,14 +61,14 @@ namespace Lykke.Service.Balances.Controllers
             if (balances == null)
                 return NotFound();
 
-            var result = balances.Select(TotalBalanceModel.Create);
+            var result = balances.Select(TotalAssetBalanceModel.Create);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("totalBalances/{assetId}")]
         [SwaggerOperation("GetTotalAssetBalance")]
-        [ProducesResponseType(typeof(TotalBalanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TotalAssetBalanceModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetTotalAssetBalance(string assetId)
         {
@@ -77,7 +77,7 @@ namespace Lykke.Service.Balances.Controllers
             if (balance == null)
                 return NotFound();
 
-            return Ok(TotalBalanceModel.Create(balance));
+            return Ok(TotalAssetBalanceModel.Create(balance));
         }
     }
 }

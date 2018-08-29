@@ -11,8 +11,6 @@ namespace Lykke.Service.Balances.Services
 {
     internal static class CacheExtensions
     {
-        // TODO: Add update predicate
-        // TODO: Make atomic
         public static async Task<T> TryGetAsync<T>(this IDistributedCache cache, 
             string key,
             Func<Task<T>> getRecordFunc, 

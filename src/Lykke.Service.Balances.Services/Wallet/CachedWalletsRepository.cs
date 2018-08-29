@@ -1,9 +1,8 @@
 ﻿using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
-using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services.Wallets;
-using Lykke.Service.Balances.Services.Wallet.CacheModels;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace Lykke.Service.Balances.Services.Wallet
             return await _cache.TryGetAsync(
                 GetAllBalancesCacheKey(walletId),
                 async () => (await _repository.GetAsync(walletId))
-                    .Select(CachedWalletModel.Copy)
+                    .Select(CachedWalletModel.Create)
                     .ToArray(),
                 slidingExpiration: _cacheExpiration,
                 log: _log);
@@ -47,7 +46,7 @@ namespace Lykke.Service.Balances.Services.Wallet
         {
             return await _cache.TryGetAsync(
                 GetAssetBalanceCacheKey(walletId, assetId),
-                async () => CachedWalletModel.Copy(await _repository.GetAsync(walletId, assetId)),
+                async () => CachedWalletModel.Create(await _repository.GetAsync(walletId, assetId)),
                 slidingExpiration: _cacheExpiration,
                 log: _log);
         }
@@ -56,7 +55,7 @@ namespace Lykke.Service.Balances.Services.Wallet
         {
             var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
 
-            var updated = await _repository.UpdateBalanceAsync(walletId, wallet);
+            var updated = await _repository.UpdateBalanceAsync(walletId, wallet, updateSequenceNumber);
             if (updated)
             {
                 var key = GetAssetBalanceCacheKey(walletId, assetId);

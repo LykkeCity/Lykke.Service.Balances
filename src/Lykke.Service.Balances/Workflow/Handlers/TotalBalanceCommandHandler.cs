@@ -18,7 +18,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
 
         public async Task<CommandHandlingResult> Handle(Commands.UpdateTotalBalanceCommand command)
         {
-            await _totalBalancesService.ChangeTotalBalanceAsync(command.AssetId, command.DeltaBalance,
+            await _totalBalancesService.ChangeTotalBalanceAsync(command.AssetId, command.BalanceDelta,
                 command.SequenceNumber);
 
             _chaosKitty.Meow("Problem with Redis");

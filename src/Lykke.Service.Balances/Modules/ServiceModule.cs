@@ -2,8 +2,7 @@
 using AzureStorage.Tables;
 using Lykke.Common.Log;
 using Lykke.Service.Balances.AzureRepositories;
-using Lykke.Service.Balances.AzureRepositories.Account;
-using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Core.Settings;
 using Lykke.Service.Balances.Services.Wallet;
@@ -28,6 +27,9 @@ namespace Lykke.Service.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<CachedWalletsRepository>()
+                .As<ICachedWalletsRepository>();
+
             builder.RegisterType<CachedWalletsRepository>()
                 .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration));

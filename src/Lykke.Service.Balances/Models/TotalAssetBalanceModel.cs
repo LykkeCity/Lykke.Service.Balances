@@ -1,15 +1,15 @@
-﻿using Lykke.Service.Balances.Core.Domain.Wallets;
+﻿using Lykke.Service.Balances.Core.Domain;
 
 namespace Lykke.Service.Balances.Models
 {
-    public class TotalBalanceModel
+    public class TotalAssetBalanceModel
     {
         public string AssetId { get; set; }
         public decimal Balance { get; set; }
 
-        public static TotalBalanceModel Create(IWallet src)
+        public static TotalAssetBalanceModel Create(TotalAssetBalance src)
         {
-            return new TotalBalanceModel
+            return new TotalAssetBalanceModel
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance

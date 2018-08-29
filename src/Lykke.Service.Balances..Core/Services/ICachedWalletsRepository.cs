@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Domain;
 
 namespace Lykke.Service.Balances.Core.Services.Wallets
 {

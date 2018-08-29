@@ -127,7 +127,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                 _cqrsEngine.PublishEvent(new UpdateTotalBalanceCommand
                 {
                     AssetId = wallet.AssetId,
-                    DeltaBalance = ParseNullabe(wallet.NewBalance) - ParseNullabe(wallet.OldBalance),
+                    BalanceDelta = ParseNullabe(wallet.NewBalance) - ParseNullabe(wallet.OldBalance),
                     SequenceNumber = header.SequenceNumber
                 }, "balances");
             }

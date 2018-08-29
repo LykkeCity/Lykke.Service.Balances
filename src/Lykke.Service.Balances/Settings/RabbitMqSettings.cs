@@ -8,9 +8,11 @@ namespace Lykke.Service.Balances.Settings
     {
         [AmqpCheck]
         public string ConnectionString { get; set; }
+
         [Optional]
         [AmqpCheck]
         public string AlternateConnectionString { get; set; }
+
         public string Exchange { get; set; }
     }
 }

@@ -7,6 +7,7 @@ namespace Lykke.Service.Balances.Settings
     {
         [AmqpCheck]
         public string RabbitConnectionString { get; set; }
+
         [Optional]
         public ChaosSettings ChaosKitty { get; set; }
     }
