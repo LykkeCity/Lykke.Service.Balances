@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Autofac;
 using Common;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
@@ -11,12 +10,13 @@ using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 
 namespace Lykke.Job.Balances.RabbitSubscribers
 {
     [UsedImplicitly]
-    public class BalanceUpdateRabbitSubscriber : IStartable, IStopable
+    public class BalanceUpdateRabbitSubscriber : IStartStop
     {
         [NotNull] private readonly ILogFactory _logFactory;
         private readonly RabbitMqSettings _rabbitMqSettings;
