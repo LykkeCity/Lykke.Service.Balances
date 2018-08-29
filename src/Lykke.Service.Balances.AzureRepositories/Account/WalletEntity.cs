@@ -15,8 +15,10 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
         public long? UpdateSequenceNumber { get; set; }
 
         internal static string GeneratePartitionKey(string walletId) => walletId;
-        internal static string GenerateTotalBalancePartitionKey() => "TotalBalance";
         internal static string GenerateRowKey(string assetId) => assetId;
+
+        internal static string GenerateAssetPartitionKey(string assetId) => assetId;
+        internal static string GenerateAssetRowKey(string walletId) => walletId;
 
         internal static WalletEntity Create(string walletId, IWallet src)
         {
@@ -27,6 +29,18 @@ namespace Lykke.Service.Balances.AzureRepositories.Account
                 Balance = src.Balance,
                 Reserved = src.Reserved,
                 UpdateSequenceNumber = src.UpdateSequenceNumber
+            };
+        }
+
+        internal WalletEntity CopyForAsset()
+        {
+            return new WalletEntity
+            {
+                PartitionKey = GenerateAssetPartitionKey(AssetId),
+                RowKey = GenerateAssetRowKey(WalletId),
+                Balance = Balance,
+                Reserved = Reserved,
+                UpdateSequenceNumber = UpdateSequenceNumber,
             };
         }
     }

@@ -10,5 +10,6 @@ namespace Lykke.Service.Balances.Client
         Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId);
         Task<ClientBalanceModel> GetClientBalanceByAssetId(AutorestClient.Models.ClientBalanceByAssetIdModel model);
         Task<IEnumerable<ClientBalanceResponseModel>> GetTotalBalances();
+        Task<ClientBalanceResponseModel> GetTotalBalance(string assetId);
     }
 }
