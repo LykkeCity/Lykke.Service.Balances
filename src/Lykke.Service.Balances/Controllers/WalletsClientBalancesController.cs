@@ -120,7 +120,7 @@ namespace Lykke.Service.Balances.Controllers
             }
             catch (Exception ex)
             {
-                _log.WriteError(nameof(WalletsClientBalancesController), nameof(GetTotalBalances), ex);
+                _log.Error(nameof(GetTotalBalance), ex, context: assetId);
 
                 return StatusCode((int)HttpStatusCode.InternalServerError, ErrorResponse.Create("Error occured while getting total balances"));
             }

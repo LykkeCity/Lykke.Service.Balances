@@ -4,12 +4,15 @@ using AzureStorage.Tables;
 using Lykke.Common.Log;
 using Lykke.Job.Balances.RabbitSubscribers;
 using Lykke.Job.Balances.Settings;
+using Lykke.Sdk;
 using Lykke.Service.Assets.Client;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.AzureRepositories.Account;
 using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Core.Settings;
+using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Caching.Distributed;
@@ -32,6 +35,15 @@ namespace Lykke.Job.Balances.Modules
         {
             var settings = _appSettings.CurrentValue;
 
+            builder.RegisterType<StartupManager>()
+                .As<IStartupManager>()
+                .SingleInstance();
+
+            builder.RegisterType<ShutdownManager>()
+                .As<IShutdownManager>()
+                .AutoActivate()
+                .SingleInstance();
+
             builder.RegisterType<CachedWalletsRepository>()
                 .As<ICachedWalletsRepository>()
                 .WithParameter(TypedParameter.From(settings.BalancesJob.BalanceCache.Expiration));
@@ -52,20 +64,19 @@ namespace Lykke.Job.Balances.Modules
             ).As<IWalletsRepository>().SingleInstance();
 
             builder.RegisterType<BalanceUpdateRabbitSubscriber>()
-                .As<IStartable>()
+                .As<IStartStop>()
                 .AutoActivate()
                 .SingleInstance()
                 .WithParameter(TypedParameter.From(settings.BalancesJob.MatchingEngineRabbit));
 
             builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
-                .As<IStartable>()
+                .As<IStartStop>()
                 .AutoActivate()
                 .SingleInstance()
                 .WithParameter(TypedParameter.From(settings.BalancesJob.AuthRabbit));
 
             builder.RegisterType<TotalBalanceCacheUpdater>()
-                .As<ITotalBalanceCacheUpdater>()
-                .As<IStartable>()
+                .As<IStartStop>()
                 .SingleInstance();
         }
     }

@@ -6,11 +6,12 @@ using Common;
 using Lykke.Common.Log;
 using Lykke.Service.Assets.Client;
 using Lykke.Service.Balances.Core.Domain.Wallets;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 
 namespace Lykke.Service.Balances.Services.Wallet
 {
-    public class TotalBalanceCacheUpdater : TimerPeriod, ITotalBalanceCacheUpdater
+    public class TotalBalanceCacheUpdater : TimerPeriod, IStartStop
     {
         private readonly IWalletsRepository _walletsRepository;
         private readonly ICachedWalletsRepository _cachedWalletsRepository;
