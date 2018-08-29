@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace Lykke.Job.Balances.RabbitSubscribers
+namespace Lykke.Service.Balances.Workflow.Events
 {
     [ProtoContract]
     public class BalanceUpdatedEvent

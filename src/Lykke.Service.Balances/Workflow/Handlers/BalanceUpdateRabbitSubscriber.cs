@@ -6,14 +6,15 @@ using Common;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Cqrs;
-using Lykke.Job.Balances.Settings;
 using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Settings;
+using Lykke.Service.Balances.Workflow.Events;
 
-namespace Lykke.Job.Balances.RabbitSubscribers
+namespace Lykke.Service.Balances.Workflow.Handlers
 {
     [UsedImplicitly]
     public class BalanceUpdateRabbitSubscriber : IStartable, IStopable
@@ -39,13 +40,13 @@ namespace Lykke.Job.Balances.RabbitSubscribers
 
         public void Start()
         {
-            _subscribers.Add(Subscribe<CashInEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashIn, ProcessMessageAsync));
-            _subscribers.Add(Subscribe<CashOutEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashOut, ProcessMessageAsync));
-            _subscribers.Add(Subscribe<CashTransferEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.CashTransfer, ProcessMessageAsync));
-            _subscribers.Add(Subscribe<ExecutionEvent>(MatchingEngine.Connector.Models.Events.Common.MessageType.Order, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<CashInEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashIn, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<CashOutEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashOut, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<CashTransferEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashTransfer, ProcessMessageAsync));
+            _subscribers.Add(Subscribe<ExecutionEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.Order, ProcessMessageAsync));
         }
 
-        private RabbitMqSubscriber<T> Subscribe<T>(MatchingEngine.Connector.Models.Events.Common.MessageType messageType, Func<T, Task> func)
+        private RabbitMqSubscriber<T> Subscribe<T>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType messageType, Func<T, Task> func)
         {
             var settings = new RabbitMqSubscriptionSettings
             {
@@ -62,7 +63,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
                     new ResilientErrorHandlingStrategy(_logFactory, settings,
                         retryTimeout: TimeSpan.FromSeconds(10),
                         next: new DeadQueueErrorHandlingStrategy(_logFactory, settings)))
-                .SetMessageDeserializer(new ProtoSerializer<T>())
+                .SetMessageDeserializer(new ProtobufMessageDeserializer<T>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(func)
                 .CreateDefaultBinding()
@@ -95,8 +96,8 @@ namespace Lykke.Job.Balances.RabbitSubscribers
             return UpdateBalances(message.Header, message.BalanceUpdates);
         }
 
-        private Task UpdateBalances(MatchingEngine.Connector.Models.Events.Common.Header header,
-            List<MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
+        private Task UpdateBalances(Lykke.MatchingEngine.Connector.Models.Events.Common.Header header,
+            List<Lykke.MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
         {
             foreach (var wallet in updates)
             {
@@ -114,6 +115,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
 
         public void Dispose()
         {
+            Stop();
             foreach (var subscriber in _subscribers)
             {
                 subscriber?.Dispose();

@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Workflow.Events;
 
-namespace Lykke.Job.Balances.RabbitSubscribers
+namespace Lykke.Service.Balances.Workflow.Projections
 {
     public class BalancesUpdateProjection
     {

@@ -7,13 +7,13 @@ using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
-using Lykke.Job.Balances.Settings;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Settings;
 using Lykke.Service.Registration.Models;
 
-namespace Lykke.Job.Balances.RabbitSubscribers
+namespace Lykke.Service.Balances.Workflow.Handlers
 {
     [UsedImplicitly]
     public class ClientAuthenticatedRabbitSubscriber : IStartable, IStopable
@@ -88,6 +88,7 @@ namespace Lykke.Job.Balances.RabbitSubscribers
 
         public void Dispose()
         {
+            Stop();
             _subscriber?.Dispose();
         }
 

@@ -8,6 +8,7 @@ using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Core.Settings;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
+using Lykke.Service.Balances.Workflow.Handlers;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
@@ -43,6 +44,20 @@ namespace Lykke.Service.Balances.Modules
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", ctx.Resolve<ILogFactory>()))
             ).As<IWalletsRepository>().SingleInstance();
+
+
+            builder.RegisterType<BalanceUpdateRabbitSubscriber>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.MatchingEngineRabbit));
+
+            builder.RegisterType<ClientAuthenticatedRabbitSubscriber>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.AuthRabbit));
+
         }
     }
 }
