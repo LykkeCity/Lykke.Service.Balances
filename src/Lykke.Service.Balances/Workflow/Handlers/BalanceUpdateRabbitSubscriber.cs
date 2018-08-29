@@ -63,7 +63,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                     new ResilientErrorHandlingStrategy(_logFactory, settings,
                         retryTimeout: TimeSpan.FromSeconds(10),
                         next: new DeadQueueErrorHandlingStrategy(_logFactory, settings)))
-                .SetMessageDeserializer(new ProtoSerializer<T>())
+                .SetMessageDeserializer(new ProtobufMessageDeserializer<T>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(func)
                 .CreateDefaultBinding()
