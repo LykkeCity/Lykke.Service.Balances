@@ -42,59 +42,7 @@ namespace Lykke.Service.Balances.AutorestClient
                     return _result.Body;
                 }
             }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='clientId'>
-            /// </param>
-            public static object GetWalletsCredentials(this IBalancesAPI operations, string clientId)
-            {
-                return operations.GetWalletsCredentialsAsync(clientId).GetAwaiter().GetResult();
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='clientId'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<object> GetWalletsCredentialsAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetWalletsCredentialsWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='clientId'>
-            /// </param>
-            public static object GetWalletsCredentialsHistory(this IBalancesAPI operations, string clientId)
-            {
-                return operations.GetWalletsCredentialsHistoryAsync(clientId).GetAwaiter().GetResult();
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='clientId'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<object> GetWalletsCredentialsHistoryAsync(this IBalancesAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetWalletsCredentialsHistoryWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
+        
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>

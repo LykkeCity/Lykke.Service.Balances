@@ -3,7 +3,6 @@ using AzureStorage.Tables;
 using Lykke.Common.Log;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.AzureRepositories.Account;
-using Lykke.Service.Balances.AzureRepositories.Wallets;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Core.Settings;
@@ -33,27 +32,17 @@ namespace Lykke.Service.Balances.Modules
                 .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration));
 
             builder.Register(c => new RedisCache(new RedisCacheOptions
-                {
-                    Configuration = _appSettings.CurrentValue.BalancesService.BalanceCache.Configuration,
-                    InstanceName = _appSettings.CurrentValue.BalancesService.BalanceCache.Instance
-                }))
+            {
+                Configuration = _appSettings.CurrentValue.BalancesService.BalanceCache.Configuration,
+                InstanceName = _appSettings.CurrentValue.BalancesService.BalanceCache.Instance
+            }))
                 .As<IDistributedCache>()
                 .SingleInstance();
-            
-            builder.Register(ctx => 
+
+            builder.Register(ctx =>
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", ctx.Resolve<ILogFactory>()))
             ).As<IWalletsRepository>().SingleInstance();
-
-            builder.Register(ctx =>
-                new WalletCredentialsRepository(AzureTableStorage<WalletCredentialsEntity>.Create(
-                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentials", ctx.Resolve<ILogFactory>()))
-            ).As<IWalletCredentialsRepository>().SingleInstance();
-
-            builder.Register(ctx =>
-                new WalletCredentialsHistoryRepository(AzureTableStorage<WalletCredentialsHistoryRecord>.Create(
-                    _dbSettings.ConnectionString(x => x.ClientPersonalInfoConnString), "WalletCredentialsHistory", ctx.Resolve<ILogFactory>()))
-            ).As<IWalletCredentialsHistoryRepository>().SingleInstance();
         }
     }
 }

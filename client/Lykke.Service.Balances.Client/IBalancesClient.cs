@@ -1,8 +1,7 @@
-using Lykke.Service.Balances.Client.Models;
+using Lykke.Service.Balances.AutorestClient.Models;
 using Lykke.Service.Balances.Client.ResponseModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Lykke.Service.Balances.AutorestClient.Models;
 
 namespace Lykke.Service.Balances.Client
 {
@@ -10,8 +9,6 @@ namespace Lykke.Service.Balances.Client
     {
         Task<IEnumerable<ClientBalanceResponseModel>> GetClientBalances(string clientId);
         Task<ClientBalanceModel> GetClientBalanceByAssetId(AutorestClient.Models.ClientBalanceByAssetIdModel model);
-        Task<WalletCredentialsModel> GetWalletCredential(string clientId);
-        Task<WalletCredentialsHistoryModel> GetWalletCredentialHistory(string clientId);
         Task<IEnumerable<ClientBalanceResponseModel>> GetTotalBalances();
     }
 }
