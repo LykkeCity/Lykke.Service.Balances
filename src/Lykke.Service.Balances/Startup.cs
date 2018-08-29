@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using JetBrains.Annotations;
 using Lykke.Sdk;
 using Lykke.Service.Balances.Settings;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Lykke.Service.Balances
 {
@@ -16,6 +15,7 @@ namespace Lykke.Service.Balances
             ApiVersion = "v1"
         };
 
+        [UsedImplicitly]
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             return services.BuildServiceProvider<AppSettings>(options =>
@@ -30,9 +30,13 @@ namespace Lykke.Service.Balances
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime)
+        [UsedImplicitly]
+        public void Configure(IApplicationBuilder app)
         {
-            app.UseLykkeConfiguration();
+            app.UseLykkeConfiguration(options =>
+            {
+                options.SwaggerOptions = _swaggerOptions;
+            });
         }
     }
 }
