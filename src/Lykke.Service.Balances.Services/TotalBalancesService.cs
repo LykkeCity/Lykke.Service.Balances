@@ -1,38 +1,45 @@
 ﻿using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
-using Microsoft.Extensions.Caching.Distributed;
-using System;
+using StackExchange.Redis;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lykke.Service.Balances.Services
 {
     public class TotalBalancesService : ITotalBalancesService
     {
-        private readonly IDistributedCache _cache;
-        private static readonly DistributedCacheEntryOptions CacheOptions = new DistributedCacheEntryOptions();
+        private static readonly string PartitionKey = "SpotClientBalances:total";
+        private readonly IDatabase _redisDatabase;
 
-        public TotalBalancesService(IDistributedCache cache)
+        public TotalBalancesService(IDatabase redisDatabase)
         {
-            _cache = cache;
+            _redisDatabase = redisDatabase;
         }
 
-        private static string GetTotalBalancesCacheKey() => ":totalBalances";
-        public Task<IReadOnlyList<TotalAssetBalance>> GetTotalBalancesAsync()
+        public async Task<IReadOnlyList<TotalAssetBalance>> GetTotalBalancesAsync()
         {
-            throw new NotImplementedException();
+            var balances = await _redisDatabase.HashGetAllAsync(PartitionKey);
+            return balances.Select(x => new TotalAssetBalance
+            {
+                AssetId = x.Name,
+                Balance = (decimal)(double)x.Value
+            }).ToList();
         }
 
-        public Task<TotalAssetBalance> GetTotalAssetBalanceAsync(string assetId)
+        public async Task<TotalAssetBalance> GetTotalAssetBalanceAsync(string assetId)
         {
-            throw new NotImplementedException();
+            var balance = await _redisDatabase.HashGetAsync(PartitionKey, assetId);
+            return new TotalAssetBalance
+            {
+                AssetId = assetId,
+                Balance = (decimal)(double)balance
+            };
         }
 
-        public Task ChangeTotalBalanceAsync(string assetId, decimal delta, long sequenceNumber)
+        public async Task ChangeTotalBalanceAsync(string assetId, decimal delta, long sequenceNumber)
         {
-            // todo: save delta to Redis
-            throw new NotImplementedException();
-            //return _cache.SetAsync(key, value, CacheOptions);
+            await _redisDatabase.HashIncrementAsync(PartitionKey, assetId, (double)delta);
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Lykke.Service.Balances.Modules
             builder.Register(ctx =>
             {
                 const string defaultRoute = "self";
+                const string defaultPipeline = "commands";
 
                 return new CqrsEngine(ctx.Resolve<ILogFactory>(),
                     ctx.Resolve<IDependencyResolver>(),
@@ -81,13 +82,17 @@ namespace Lykke.Service.Balances.Modules
 
                     Register.BoundedContext("balances")
                         .ListeningCommands(typeof(UpdateTotalBalanceCommand))
-                        .On(defaultRoute)
+                        .On(defaultPipeline)
                         .WithCommandsHandler<TotalBalanceCommandHandler>()
                         .PublishingEvents(typeof(BalanceUpdatedEvent))
                         .With(defaultRoute)
                         .ListeningEvents(typeof(BalanceUpdatedEvent))
                         .From("balances").On(defaultRoute)
-                        .WithProjection(typeof(BalancesUpdateProjection), "balances")
+                        .WithProjection(typeof(BalancesUpdateProjection), "balances"),
+
+                    Register.DefaultRouting
+                        .PublishingCommands(typeof(UpdateTotalBalanceCommand))
+                        .To("balances").With(defaultPipeline)
                 );
             })
             .As<ICqrsEngine>().SingleInstance().AutoActivate();

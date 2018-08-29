@@ -124,12 +124,12 @@ namespace Lykke.Service.Balances.Workflow.Handlers
         {
             foreach (var wallet in updates)
             {
-                _cqrsEngine.PublishEvent(new UpdateTotalBalanceCommand
+                _cqrsEngine.SendCommand(new UpdateTotalBalanceCommand
                 {
                     AssetId = wallet.AssetId,
                     BalanceDelta = ParseNullabe(wallet.NewBalance) - ParseNullabe(wallet.OldBalance),
                     SequenceNumber = header.SequenceNumber
-                }, "balances");
+                }, "balances", "balances");
             }
         }
         private decimal ParseNullabe(string value)
