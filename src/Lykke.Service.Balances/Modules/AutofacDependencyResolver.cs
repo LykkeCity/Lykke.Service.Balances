@@ -2,7 +2,7 @@
 using Autofac;
 using Lykke.Cqrs;
 
-namespace Lykke.Job.Balances.Modules
+namespace Lykke.Service.Balances.Modules
 {
     internal class AutofacDependencyResolver : IDependencyResolver
     {

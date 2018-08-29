@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.Service.Balances", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.Service.Balances.Core", "src\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj", "{512D28C7-171F-4402-9B85-C4A6D6323A54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.Job.Balances", "src\Lykke.Job.Balances\Lykke.Job.Balances.csproj", "{27DA8943-71F9-42C8-B11E-AEDD5604DC00}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,10 +59,6 @@ Global
 		{512D28C7-171F-4402-9B85-C4A6D6323A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{512D28C7-171F-4402-9B85-C4A6D6323A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{512D28C7-171F-4402-9B85-C4A6D6323A54}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27DA8943-71F9-42C8-B11E-AEDD5604DC00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27DA8943-71F9-42C8-B11E-AEDD5604DC00}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27DA8943-71F9-42C8-B11E-AEDD5604DC00}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27DA8943-71F9-42C8-B11E-AEDD5604DC00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

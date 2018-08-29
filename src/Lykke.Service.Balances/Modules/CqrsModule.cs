@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
-using Autofac;
+﻿using Autofac;
 using Lykke.Common.Chaos;
 using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
-using Lykke.Job.Balances.RabbitSubscribers;
-using Lykke.Job.Balances.Settings;
 using Lykke.Messaging;
 using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
+using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
+using System.Collections.Generic;
+using Lykke.Service.Balances.Workflow.Events;
+using Lykke.Service.Balances.Workflow.Projections;
 
-namespace Lykke.Job.Balances.Modules
+namespace Lykke.Service.Balances.Modules
 {
     public class CqrsModule : Module
     {
@@ -19,7 +20,7 @@ namespace Lykke.Job.Balances.Modules
 
         public CqrsModule(IReloadingManager<AppSettings> settingsManager)
         {
-            _settings = settingsManager.CurrentValue.BalancesJob.Cqrs;
+            _settings = settingsManager.CurrentValue.BalancesService.Cqrs;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -57,7 +58,7 @@ namespace Lykke.Job.Balances.Modules
                     }
                 }),
                 new RabbitMqTransportFactory(ctx.Resolve<ILogFactory>()))).As<IMessagingEngine>().SingleInstance();
-            
+
             builder.RegisterType<BalancesUpdateProjection>();
 
             builder.Register(ctx =>

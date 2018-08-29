@@ -1,7 +1,7 @@
 ﻿using Lykke.Common.Chaos;
 using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Job.Balances.Settings
+namespace Lykke.Service.Balances.Settings
 {
     public class CqrsSettings
     {
