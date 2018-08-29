@@ -1,9 +1,8 @@
 # Lykke.Service.Balances 
 
-# Main purpose
+# Purpose
 
   - Keeping the read-model of balances of each wallet, and of the whole market.
-  - [oboslete, and should be removed] Keeping the read-model of "wallet credentials".
 
 # Contracts
 
@@ -17,10 +16,6 @@ Output (HTTP):
   - get wallet balances by wallet id;
   - get wallet balances by wallet id and asset id;
   - get total market balances;
-
-Output (HTTP, obsolete):
-  - get wallets credentials by client (wallet?) id;
-  - get wallets credentials history by client (wallet?) id;
 
 # Scaling
 Current implementation is: job (Lykke.Job.Balances) + service (Lykke.Service.Balances).
