@@ -88,6 +88,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
 
         public void Dispose()
         {
+            Stop();
             _subscriber?.Dispose();
         }
 

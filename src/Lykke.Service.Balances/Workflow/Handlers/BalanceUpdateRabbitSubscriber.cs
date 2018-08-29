@@ -115,6 +115,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
 
         public void Dispose()
         {
+            Stop();
             foreach (var subscriber in _subscribers)
             {
                 subscriber?.Dispose();
