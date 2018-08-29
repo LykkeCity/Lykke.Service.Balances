@@ -17,7 +17,11 @@ namespace Lykke.Service.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            var redis = ConnectionMultiplexer.Connect(_settings.Configuration);
+            System.Threading.ThreadPool.SetMinThreads(100, 100);
+            var options = ConfigurationOptions.Parse(_settings.Configuration);
+            options.ReconnectRetryPolicy = new ExponentialRetry(3000, 15000);
+
+            var redis = ConnectionMultiplexer.Connect(options);
 
             builder.RegisterInstance(redis).SingleInstance();
             builder.Register(
