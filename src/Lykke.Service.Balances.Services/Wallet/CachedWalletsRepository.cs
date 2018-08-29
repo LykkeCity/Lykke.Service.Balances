@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Log;
+﻿using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain.Wallets;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Services.Wallet.CacheModels;
 using Microsoft.Extensions.Caching.Distributed;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lykke.Service.Balances.Services.Wallet
 {
@@ -22,7 +22,7 @@ namespace Lykke.Service.Balances.Services.Wallet
 
         public CachedWalletsRepository(
             [NotNull] IDistributedCache cache,
-            [NotNull] IWalletsRepository repository, 
+            [NotNull] IWalletsRepository repository,
             TimeSpan cacheExpiration,
             [NotNull] ILogFactory logFactory)
         {
@@ -70,21 +70,9 @@ namespace Lykke.Service.Balances.Services.Wallet
             return GetAllAsync(walletId);
         }
 
-        public async Task<IReadOnlyList<IWallet>> GetTotalBalancesAsync()
-        {
-            return await _cache.TryGetAsync(
-                GetTotalBalancesCacheKey(),
-                async () => (await _repository.GetTotalBalancesAsync())
-                    .Select(CachedWalletModel.Copy)
-                    .ToArray(),
-                slidingExpiration: _cacheExpiration,
-                log: _log);
-        }
-
 
         private static string GetAllBalancesCacheKey(string walletId) => $":balances:{walletId}:all";
         private static string GetAssetBalanceCacheKey(string walletId, string assetId) => $":balances:{walletId}:{assetId}";
 
-        private static string GetTotalBalancesCacheKey() => ":totalBalances";
     }
 }

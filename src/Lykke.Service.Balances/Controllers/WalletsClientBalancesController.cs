@@ -1,15 +1,12 @@
-﻿using Common.Log;
-using Lykke.Service.Balances.Models.ClientBalances;
+﻿using Lykke.Service.Balances.Core.Services;
+using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Common.Log;
-using Lykke.Service.Balances.Core.Services.Wallets;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Balances.Controllers
 {
@@ -17,35 +14,24 @@ namespace Lykke.Service.Balances.Controllers
     public class WalletsClientBalancesController : Controller
     {
         private readonly ICachedWalletsRepository _cachedWalletsRepository;
-        private readonly ILog _log;
+        private readonly ITotalBalancesService _totalBalancesService;
 
-        public WalletsClientBalancesController(ICachedWalletsRepository cachedWalletsRepository, ILogFactory logFactory)
+        public WalletsClientBalancesController(ICachedWalletsRepository cachedWalletsRepository, ITotalBalancesService totalBalancesService)
         {
             _cachedWalletsRepository = cachedWalletsRepository;
-            _log = logFactory.CreateLog(this);
+            _totalBalancesService = totalBalancesService;
         }
 
         [HttpGet]
         [Route("{clientId}")]
         [SwaggerOperation("GetClientBalances")]
         [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetClientBalances(string clientId)
         {
-            try
-            {
-                var wallets = await _cachedWalletsRepository.GetAllAsync(clientId);
-                var result = wallets.Select(ClientBalanceResponseModel.Create);
+            var wallets = await _cachedWalletsRepository.GetAllAsync(clientId);
+            var result = wallets.Select(ClientBalanceResponseModel.Create);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _log.Error(nameof(GetClientBalances), ex, $"clientId = {clientId}");
-
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    ErrorResponse.Create("Error occured while getting client balances"));
-            }
+            return Ok(result);
         }
 
         [HttpGet]
@@ -53,52 +39,45 @@ namespace Lykke.Service.Balances.Controllers
         [SwaggerOperation("GetClientBalancesByAssetId")]
         [ProducesResponseType(typeof(ClientBalanceResponseModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetClientBalancesByAssetId(string clientId, string assetId)
         {
-            try
-            {
-                var wallet = await _cachedWalletsRepository.GetAsync(clientId, assetId);
+            var wallet = await _cachedWalletsRepository.GetAsync(clientId, assetId);
 
-                if (wallet == null)
-                    return NotFound();
+            if (wallet == null)
+                return NotFound();
 
-                return Ok(ClientBalanceResponseModel.Create(wallet));
-            }
-            catch (Exception ex)
-            {
-                _log.Error(nameof(GetClientBalancesByAssetId), ex, $"clientId = {clientId}, assetId = {assetId}");
-
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    ErrorResponse.Create("Error occured while getting client balance by asset"));
-            }
+            return Ok(ClientBalanceResponseModel.Create(wallet));
         }
 
         [HttpGet]
         [Route("totalBalances")]
         [SwaggerOperation("GetTotalBalances")]
-        [ProducesResponseType(typeof(IEnumerable<ClientBalanceResponseModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<TotalBalanceModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetTotalBalances()
         {
-            try
-            {
-                var balances = await _cachedWalletsRepository.GetTotalBalancesAsync();
+            var balances = await _totalBalancesService.GetTotalBalancesAsync();
 
-                if (balances == null)
-                    return NotFound();
+            if (balances == null)
+                return NotFound();
 
-                var result = balances.Select(ClientBalanceResponseModel.Create);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _log.Error(nameof(GetTotalBalances), ex);
+            var result = balances.Select(TotalBalanceModel.Create);
+            return Ok(result);
+        }
 
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    ErrorResponse.Create("Error occured while getting total balances"));
-            }
+        [HttpGet]
+        [Route("totalBalances/{assetId}")]
+        [SwaggerOperation("GetTotalAssetBalance")]
+        [ProducesResponseType(typeof(TotalBalanceModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetTotalAssetBalance(string assetId)
+        {
+            var balance = await _totalBalancesService.GetTotalAssetBalanceAsync(assetId);
+
+            if (balance == null)
+                return NotFound();
+
+            return Ok(TotalBalanceModel.Create(balance));
         }
     }
 }
