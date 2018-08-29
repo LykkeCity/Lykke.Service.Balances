@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
@@ -10,13 +9,14 @@ using Lykke.Common.Log;
 using Lykke.Job.Balances.Settings;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Registration.Models;
 
 namespace Lykke.Job.Balances.RabbitSubscribers
 {
     [UsedImplicitly]
-    public class ClientAuthenticatedRabbitSubscriber : IStartable, IStopable
+    public class ClientAuthenticatedRabbitSubscriber : IStartStop
     {
         private readonly ICachedWalletsRepository _cachedWalletsRepository;
         private readonly ILog _log;
