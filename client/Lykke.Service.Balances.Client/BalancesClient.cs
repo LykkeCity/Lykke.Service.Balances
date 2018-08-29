@@ -89,32 +89,6 @@ namespace Lykke.Service.Balances.Client
             throw new Exception(UexpectedApiResponse);
         }
 
-        public async Task<ClientBalanceResponseModel> GetTotalBalance(string assetId)
-        {
-            var response = await _service.GetTotalBalanceAsync(assetId);
-
-            if (response is ErrorResponse error)
-                throw new Exception(error.ErrorMessage);
-
-            if (response is ClientBalanceResponseModel result)
-                return result;
-
-            throw new Exception(UexpectedApiResponse);
-        }
-
-        public async Task<ClientBalanceResponseModel> GetTotalBalance(string assetId)
-        {
-            var response = await _service.GetTotalBalanceAsync(assetId);
-
-            if (response is ErrorResponse error)
-                throw new Exception(error.ErrorMessage);
-
-            if (response is ClientBalanceResponseModel result)
-                return result;
-
-            throw new Exception(UexpectedApiResponse);
-        }
-
         public void Dispose()
         {
             if (_service == null)

@@ -141,57 +141,5 @@ namespace Lykke.Service.Balances.AutorestClient
                 }
             }
 
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='assetId'>
-            /// </param>
-            public static object GetTotalBalance(this IBalancesAPI operations, string assetId)
-            {
-                return operations.GetTotalBalanceAsync(assetId).GetAwaiter().GetResult();
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='assetId'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<object> GetTotalBalanceAsync(this IBalancesAPI operations, string assetId, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetTotalBalanceWithHttpMessagesAsync(assetId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='assetId'>
-            /// </param>
-            public static object GetTotalBalance(this IBalancesAPI operations, string assetId)
-            {
-                return operations.GetTotalBalanceAsync(assetId).GetAwaiter().GetResult();
-            }
-
-            /// <param name='operations'>
-            /// The operations group for this extension method.
-            /// </param>
-            /// <param name='assetId'>
-            /// </param>
-            /// <param name='cancellationToken'>
-            /// The cancellation token.
-            /// </param>
-            public static async Task<object> GetTotalBalanceAsync(this IBalancesAPI operations, string assetId, CancellationToken cancellationToken = default(CancellationToken))
-            {
-                using (var _result = await operations.GetTotalBalanceWithHttpMessagesAsync(assetId, null, cancellationToken).ConfigureAwait(false))
-                {
-                    return _result.Body;
-                }
-            }
-
     }
 }
