@@ -20,7 +20,10 @@ namespace Lykke.Service.Balances.Services
             if (record == null)
             {
                 record = await getRecordFunc();
-                await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
+                if (record != null)
+                {
+                    await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
+                }
             }
 
             return record;
@@ -33,10 +36,10 @@ namespace Lykke.Service.Balances.Services
         {
             try
             {
-                var balance = await cache.HashGetAsync(key, field);
-                if (balance.HasValue)
+                var record = await cache.HashGetAsync(key, field);
+                if (record.HasValue)
                 {
-                    return CacheSerializer.Deserialize<T>(balance);
+                    return CacheSerializer.Deserialize<T>(record);
                 }
             }
             catch (RedisConnectionException ex)

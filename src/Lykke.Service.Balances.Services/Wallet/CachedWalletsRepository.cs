@@ -54,7 +54,6 @@ namespace Lykke.Service.Balances.Services.Wallet
 
             var result = (await _repository.GetAsync(walletId)).Select(CachedWalletModel.Create).ToArray();
 
-
             try
             {
                 await _redisDatabase.HashSetAsync(
