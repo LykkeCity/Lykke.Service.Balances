@@ -8,6 +8,7 @@ namespace Lykke.Service.Balances.Core.Settings
     {
         [AzureTableCheck]
         public string LogsConnString { get; set; }
+
         [AzureTableCheck]
         public string BalancesConnString { get; set; }
     }

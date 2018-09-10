@@ -9,7 +9,9 @@ using Lykke.Messaging.RabbitMq;
 using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
 using System.Collections.Generic;
+using Lykke.Service.Balances.Workflow.Commands;
 using Lykke.Service.Balances.Workflow.Events;
+using Lykke.Service.Balances.Workflow.Handlers;
 using Lykke.Service.Balances.Workflow.Projections;
 
 namespace Lykke.Service.Balances.Modules
@@ -60,10 +62,12 @@ namespace Lykke.Service.Balances.Modules
                 new RabbitMqTransportFactory(ctx.Resolve<ILogFactory>()))).As<IMessagingEngine>().SingleInstance();
 
             builder.RegisterType<BalancesUpdateProjection>();
+            builder.RegisterType<TotalBalanceCommandHandler>();
 
             builder.Register(ctx =>
             {
                 const string defaultRoute = "self";
+                const string defaultPipeline = "commands";
 
                 return new CqrsEngine(ctx.Resolve<ILogFactory>(),
                     ctx.Resolve<IDependencyResolver>(),
@@ -77,11 +81,18 @@ namespace Lykke.Service.Balances.Modules
                         exclusiveQueuePostfix: "k8s")),
 
                     Register.BoundedContext("balances")
+                        .ListeningCommands(typeof(UpdateTotalBalanceCommand))
+                        .On(defaultPipeline)
+                        .WithCommandsHandler<TotalBalanceCommandHandler>()
                         .PublishingEvents(typeof(BalanceUpdatedEvent))
                         .With(defaultRoute)
                         .ListeningEvents(typeof(BalanceUpdatedEvent))
                         .From("balances").On(defaultRoute)
-                        .WithProjection(typeof(BalancesUpdateProjection), "balances")
+                        .WithProjection(typeof(BalancesUpdateProjection), "balances"),
+
+                    Register.DefaultRouting
+                        .PublishingCommands(typeof(UpdateTotalBalanceCommand))
+                        .To("balances").With(defaultPipeline)
                 );
             })
             .As<ICqrsEngine>().SingleInstance().AutoActivate();

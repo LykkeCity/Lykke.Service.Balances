@@ -12,6 +12,7 @@ using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Settings;
+using Lykke.Service.Balances.Workflow.Commands;
 using Lykke.Service.Balances.Workflow.Events;
 
 namespace Lykke.Service.Balances.Workflow.Handlers
@@ -75,17 +76,22 @@ namespace Lykke.Service.Balances.Workflow.Handlers
 
         private Task ProcessMessageAsync(CashInEvent message)
         {
-            return UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateTotalBalances(message.Header, message.BalanceUpdates);
+            return Task.CompletedTask;
         }
 
         private Task ProcessMessageAsync(CashOutEvent message)
         {
-            return UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateTotalBalances(message.Header, message.BalanceUpdates);
+            return Task.CompletedTask;
         }
 
         private Task ProcessMessageAsync(CashTransferEvent message)
         {
-            return UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateBalances(message.Header, message.BalanceUpdates);
+            return Task.CompletedTask;
         }
 
         private Task ProcessMessageAsync(ExecutionEvent message)
@@ -93,10 +99,11 @@ namespace Lykke.Service.Balances.Workflow.Handlers
             if (message.BalanceUpdates == null)
                 return Task.CompletedTask;
 
-            return UpdateBalances(message.Header, message.BalanceUpdates);
+            UpdateBalances(message.Header, message.BalanceUpdates);
+            return Task.CompletedTask;
         }
 
-        private Task UpdateBalances(Lykke.MatchingEngine.Connector.Models.Events.Common.Header header,
+        private void UpdateBalances(Lykke.MatchingEngine.Connector.Models.Events.Common.Header header,
             List<Lykke.MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
         {
             foreach (var wallet in updates)
@@ -110,7 +117,24 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                     SequenceNumber = header.SequenceNumber
                 }, "balances");
             }
-            return Task.CompletedTask;
+        }
+
+        private void UpdateTotalBalances(Lykke.MatchingEngine.Connector.Models.Events.Common.Header header,
+            List<Lykke.MatchingEngine.Connector.Models.Events.Common.BalanceUpdate> updates)
+        {
+            foreach (var wallet in updates)
+            {
+                _cqrsEngine.SendCommand(new UpdateTotalBalanceCommand
+                {
+                    AssetId = wallet.AssetId,
+                    BalanceDelta = ParseNullabe(wallet.NewBalance) - ParseNullabe(wallet.OldBalance),
+                    SequenceNumber = header.SequenceNumber
+                }, "balances", "balances");
+            }
+        }
+        private decimal ParseNullabe(string value)
+        {
+            return !string.IsNullOrEmpty(value) ? decimal.Parse(value) : default;
         }
 
         public void Dispose()
