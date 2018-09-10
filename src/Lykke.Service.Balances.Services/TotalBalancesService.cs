@@ -1,9 +1,11 @@
-﻿using Lykke.Service.Balances.Core.Domain;
+﻿using System;
+using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
 using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Lykke.Service.Balances.Services
 {
@@ -12,10 +14,10 @@ namespace Lykke.Service.Balances.Services
         private readonly IDatabase _redisDatabase;
         private readonly string _partitionKey;
 
-        public TotalBalancesService(IDatabase redisDatabase, string partitionKey)
+        public TotalBalancesService([NotNull] IDatabase redisDatabase, [NotNull] string partitionKey)
         {
-            _redisDatabase = redisDatabase;
-            _partitionKey = partitionKey;
+            _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
+            _partitionKey = partitionKey ?? throw new ArgumentNullException(nameof(partitionKey));
         }
 
         public async Task<IReadOnlyList<TotalAssetBalance>> GetTotalBalancesAsync()

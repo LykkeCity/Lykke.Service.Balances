@@ -29,6 +29,7 @@ namespace Lykke.Service.Balances.Services.Wallet
             [NotNull] IDatabase redisDatabase,
             [NotNull] string partitionKey)
         {
+            if (logFactory == null) throw new ArgumentNullException(nameof(logFactory));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _cacheExpiration = cacheExpiration;
             _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
@@ -87,7 +88,12 @@ namespace Lykke.Service.Balances.Services.Wallet
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet, updateSequenceNumber);
             if (updated)
             {
-                await _redisDatabase.TryHashSetAsync(GetCacheKey(walletId), assetId, wallet);
+                await _redisDatabase.TryHashSetAsync(
+                    GetCacheKey(walletId),
+                    assetId,
+                    wallet,
+                    _cacheExpiration,
+                    _log);
             }
         }
 
