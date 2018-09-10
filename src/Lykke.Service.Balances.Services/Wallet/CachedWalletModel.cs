@@ -1,13 +1,18 @@
 ﻿using Lykke.Service.Balances.Core.Domain;
 using MessagePack;
+using ProtoBuf;
 
 namespace Lykke.Service.Balances.Services.Wallet
 {
+    [ProtoContract]
     [MessagePackObject(keyAsPropertyName: true)]
     public class CachedWalletModel : IWallet
     {
+        [ProtoMember(1)]
         public string AssetId { get; private set; }
+        [ProtoMember(2)]
         public decimal Balance { get; private set; }
+        [ProtoMember(3)]
         public decimal Reserved { get; private set; }
 
         public static CachedWalletModel Create(IWallet from)
