@@ -7,12 +7,12 @@ using Lykke.Messaging;
 using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
 using Lykke.Service.Balances.Settings;
-using Lykke.SettingsReader;
-using System.Collections.Generic;
 using Lykke.Service.Balances.Workflow.Commands;
 using Lykke.Service.Balances.Workflow.Events;
 using Lykke.Service.Balances.Workflow.Handlers;
 using Lykke.Service.Balances.Workflow.Projections;
+using Lykke.SettingsReader;
+using System.Collections.Generic;
 
 namespace Lykke.Service.Balances.Modules
 {
@@ -42,9 +42,6 @@ namespace Lykke.Service.Balances.Modules
                     .As<IChaosKitty>()
                     .SingleInstance();
             }
-
-
-            Messaging.Serialization.MessagePackSerializerFactory.Defaults.FormatterResolver = MessagePack.Resolvers.ContractlessStandardResolver.Instance;
 
             builder.Register(context => new AutofacDependencyResolver(context)).As<IDependencyResolver>().SingleInstance();
 

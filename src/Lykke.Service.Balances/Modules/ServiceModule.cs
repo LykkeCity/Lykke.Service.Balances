@@ -11,8 +11,6 @@ using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
 using Lykke.Service.Balances.Workflow.Handlers;
 using Lykke.SettingsReader;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Redis;
 
 namespace Lykke.Service.Balances.Modules
 {
@@ -30,19 +28,13 @@ namespace Lykke.Service.Balances.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<TotalBalancesService>()
+                .WithParameter(TypedParameter.From($"{_appSettings.CurrentValue.BalancesService.BalanceCache.Instance}:total"))
                 .As<ITotalBalancesService>();
 
             builder.RegisterType<CachedWalletsRepository>()
-                .As<ICachedWalletsRepository>()
-                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration));
-
-            builder.Register(c => new RedisCache(new RedisCacheOptions
-            {
-                Configuration = _appSettings.CurrentValue.BalancesService.BalanceCache.Configuration,
-                InstanceName = _appSettings.CurrentValue.BalancesService.BalanceCache.Instance
-            }))
-                .As<IDistributedCache>()
-                .SingleInstance();
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceCache.Expiration))
+                .WithParameter(TypedParameter.From($"{_appSettings.CurrentValue.BalancesService.BalanceCache.Instance}:balances"))
+                .As<ICachedWalletsRepository>();
 
             builder.Register(ctx =>
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
