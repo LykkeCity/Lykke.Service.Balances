@@ -33,6 +33,9 @@ namespace Lykke.Service.Balances.Services
         public async Task<TotalAssetBalance> GetTotalAssetBalanceAsync(string assetId)
         {
             var balance = await _redisDatabase.HashGetAsync(_partitionKey, assetId);
+            if (balance.IsNull)
+                return null;
+
             return new TotalAssetBalance
             {
                 AssetId = assetId,
