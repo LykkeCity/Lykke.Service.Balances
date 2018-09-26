@@ -1,11 +1,11 @@
-﻿using System;
+﻿using JetBrains.Annotations;
 using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
 using StackExchange.Redis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Lykke.Service.Balances.Services
 {
@@ -13,11 +13,21 @@ namespace Lykke.Service.Balances.Services
     {
         private readonly IDatabase _redisDatabase;
         private readonly string _partitionKey;
+        private readonly IWalletsRepository _walletsRepository;
 
-        public TotalBalancesService([NotNull] IDatabase redisDatabase, [NotNull] string partitionKey)
+        public TotalBalancesService([NotNull] IDatabase redisDatabase, [NotNull] string partitionKey,
+            [NotNull] IWalletsRepository walletsRepository)
         {
             _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
             _partitionKey = partitionKey ?? throw new ArgumentNullException(nameof(partitionKey));
+            _walletsRepository = walletsRepository ?? throw new ArgumentNullException(nameof(walletsRepository));
+        }
+
+        public async Task InitAsync()
+        {
+            var balances = await _walletsRepository.GetTotalBalancesAsync();
+            await _redisDatabase.HashSetAsync(_partitionKey,
+                balances.Select(x => new HashEntry(x.Key, (double)x.Value)).ToArray());
         }
 
         public async Task<IReadOnlyList<TotalAssetBalance>> GetTotalBalancesAsync()
