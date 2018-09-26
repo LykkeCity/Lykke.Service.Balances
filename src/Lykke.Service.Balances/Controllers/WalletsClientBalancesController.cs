@@ -79,5 +79,16 @@ namespace Lykke.Service.Balances.Controllers
 
             return Ok(TotalAssetBalanceModel.Create(balance));
         }
+
+        [HttpPost]
+        [Route("init")]
+        [SwaggerOperation("InitTotalAssetBalance")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> InitTotalAssetBalance()
+        {
+            await _totalBalancesService.InitAsync();
+
+            return Ok();
+        }
     }
 }
