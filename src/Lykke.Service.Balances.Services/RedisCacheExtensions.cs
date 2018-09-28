@@ -12,6 +12,7 @@ namespace Lykke.Service.Balances.Services
             string key,
             string field,
             Func<Task<T>> getRecordFunc,
+            Func<Task> reloadAllAction,
             TimeSpan? cacheExpiration,
             ILog log = null)
         {
@@ -22,7 +23,14 @@ namespace Lykke.Service.Balances.Services
                 record = await getRecordFunc();
                 if (record != null)
                 {
-                    await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
+                    if (!await cache.KeyExistsAsync(key) && reloadAllAction != null)
+                    {
+                        await reloadAllAction();
+                    }
+                    else
+                    {
+                        await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
+                    }
                 }
             }
 
