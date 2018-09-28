@@ -53,6 +53,11 @@ namespace Lykke.Service.Balances.Services.Wallet
                 _log.Warning("Redis cache is not available", ex);
             }
 
+            return await ReloadAllAsync(walletId);
+        }
+
+        private async Task<IReadOnlyList<IWallet>> ReloadAllAsync(string walletId)
+        {
             var result = (await _repository.GetAsync(walletId)).Select(CachedWalletModel.Create).ToArray();
 
             try
@@ -77,6 +82,7 @@ namespace Lykke.Service.Balances.Services.Wallet
                 GetCacheKey(walletId),
                 assetId,
                 async () => CachedWalletModel.Create(await _repository.GetAsync(walletId, assetId)),
+                async () => await ReloadAllAsync(walletId),
                 _cacheExpiration,
                 _log);
         }
@@ -99,7 +105,7 @@ namespace Lykke.Service.Balances.Services.Wallet
 
         public Task CacheItAsync(string walletId)
         {
-            return GetAllAsync(walletId);
+            return ReloadAllAsync(walletId);
         }
 
         private string GetCacheKey(string walletId) => $"{_partitionKey}:{walletId}";

@@ -12,6 +12,7 @@ namespace Lykke.Service.Balances.Services
             string key,
             string field,
             Func<Task<T>> getRecordFunc,
+            Func<Task> reloadAllAction,
             TimeSpan? cacheExpiration,
             ILog log = null)
         {
@@ -22,6 +23,29 @@ namespace Lykke.Service.Balances.Services
                 record = await getRecordFunc();
                 if (record != null)
                 {
+                    try
+                    {
+                        var token = Environment.MachineName;
+                        if (await cache.LockTakeAsync(key + "lock", token, TimeSpan.FromSeconds(5)))
+                        {
+                            try
+                            {
+                                if (!await cache.KeyExistsAsync(key) && reloadAllAction != null)
+                                {
+                                    await reloadAllAction();
+                                }
+                            }
+                            finally
+                            {
+                                await cache.LockReleaseAsync(key, token);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log?.Warning("Redis cache is not available", ex);
+                    }
+
                     await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
                 }
             }
