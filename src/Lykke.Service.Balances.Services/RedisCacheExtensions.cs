@@ -23,14 +23,30 @@ namespace Lykke.Service.Balances.Services
                 record = await getRecordFunc();
                 if (record != null)
                 {
-                    if (!await cache.KeyExistsAsync(key) && reloadAllAction != null)
+                    try
                     {
-                        await reloadAllAction();
+                        var token = Environment.MachineName;
+                        if (await cache.LockTakeAsync(key + "lock", token, TimeSpan.FromSeconds(5)))
+                        {
+                            try
+                            {
+                                if (!await cache.KeyExistsAsync(key) && reloadAllAction != null)
+                                {
+                                    await reloadAllAction();
+                                }
+                            }
+                            finally
+                            {
+                                await cache.LockReleaseAsync(key, token);
+                            }
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
+                        log?.Warning("Redis cache is not available", ex);
                     }
+
+                    await cache.TryHashSetAsync(key, field, record, cacheExpiration, log);
                 }
             }
 
