@@ -70,7 +70,6 @@ namespace Lykke.Service.Balances.Services.Wallet
             catch (RedisConnectionException ex)
             {
                 _log.Warning("Redis cache is not available", ex);
-                // ignoring the errors
             }
 
             return result;
@@ -94,12 +93,23 @@ namespace Lykke.Service.Balances.Services.Wallet
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet, updateSequenceNumber);
             if (updated)
             {
-                await _redisDatabase.TryHashSetAsync(
-                    GetCacheKey(walletId),
-                    assetId,
-                    wallet,
-                    _cacheExpiration,
-                    _log);
+                var cacheKey = GetCacheKey(walletId);
+                try
+                {
+                    if (await _redisDatabase.KeyExistsAsync(cacheKey))
+                    {
+                        await _redisDatabase.TryHashSetAsync(
+                            cacheKey,
+                            assetId,
+                            wallet,
+                            _cacheExpiration,
+                            _log);
+                    }
+                }
+                catch (RedisConnectionException ex)
+                {
+                    _log.Warning("Redis cache is not available", ex);
+                }
             }
         }
 
