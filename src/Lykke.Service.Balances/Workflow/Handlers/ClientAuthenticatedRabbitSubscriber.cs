@@ -40,7 +40,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .CreateForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, QueueName);
+                .ForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, QueueName);
 
             _subscriber = new RabbitMqSubscriber<ClientAuthInfo>(
                     _logFactory,

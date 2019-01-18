@@ -6,9 +6,8 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="Lykke.AzureQueueIntegration" Version="2.3.0" />
-    <PackageReference Include="Lykke.Common" Version="7.0.4" />
-    <PackageReference Include="Lykke.SettingsReader" Version="4.0.1" />
+    <PackageReference Include="Lykke.Common" Version="7.3.1" />
+    <PackageReference Include="Lykke.SettingsReader" Version="4.2.0" />
   </ItemGroup>
 </Project>

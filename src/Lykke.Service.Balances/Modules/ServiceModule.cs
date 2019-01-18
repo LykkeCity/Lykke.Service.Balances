@@ -1,11 +1,11 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Lykke.Common.Log;
+using Lykke.Sdk;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
-using Lykke.Service.Balances.Core.Settings;
 using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
@@ -27,6 +27,10 @@ namespace Lykke.Service.Balances.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<StartupManager>()
+                .As<IStartupManager>()
+                .SingleInstance();
+
             builder.RegisterType<TotalBalancesService>()
                 .WithParameter(TypedParameter.From($"{_appSettings.CurrentValue.BalancesService.BalanceCache.Instance}:total"))
                 .As<ITotalBalancesService>();
@@ -40,7 +44,6 @@ namespace Lykke.Service.Balances.Modules
                 new WalletsRepository(AzureTableStorage<WalletEntity>.Create(
                     _dbSettings.ConnectionString(x => x.BalancesConnString), "Balances", ctx.Resolve<ILogFactory>()))
             ).As<IWalletsRepository>().SingleInstance();
-
 
             builder.RegisterType<BalanceUpdateRabbitSubscriber>()
                 .As<IStartable>()

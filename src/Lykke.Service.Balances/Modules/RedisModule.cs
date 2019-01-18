@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Lykke.Service.Balances.Core.Settings;
 using Lykke.Service.Balances.Settings;
 using Lykke.SettingsReader;
 using StackExchange.Redis;
