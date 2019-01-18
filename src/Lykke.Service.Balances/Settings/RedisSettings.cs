@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace Lykke.Service.Balances.Core.Settings
+namespace Lykke.Service.Balances.Settings
 {
     [UsedImplicitly]
     public class RedisSettings

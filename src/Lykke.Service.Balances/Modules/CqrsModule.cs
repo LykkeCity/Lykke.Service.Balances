@@ -66,7 +66,7 @@ namespace Lykke.Service.Balances.Modules
                 const string defaultRoute = "self";
                 const string defaultPipeline = "commands";
 
-                return new CqrsEngine(ctx.Resolve<ILogFactory>(),
+                var engine = new CqrsEngine(ctx.Resolve<ILogFactory>(),
                     ctx.Resolve<IDependencyResolver>(),
                     ctx.Resolve<IMessagingEngine>(),
                     new DefaultEndpointProvider(),
@@ -91,8 +91,13 @@ namespace Lykke.Service.Balances.Modules
                         .PublishingCommands(typeof(UpdateTotalBalanceCommand))
                         .To("balances").With(defaultPipeline)
                 );
+
+                engine.StartPublishers();
+                return engine;
             })
-            .As<ICqrsEngine>().SingleInstance().AutoActivate();
+            .As<ICqrsEngine>()
+            .SingleInstance()
+            .AutoActivate();
         }
     }
 }

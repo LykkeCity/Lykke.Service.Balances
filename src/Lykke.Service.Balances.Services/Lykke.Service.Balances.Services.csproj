@@ -6,7 +6,6 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.2" />
     <PackageReference Include="protobuf-net" Version="2.4.0" />
   </ItemGroup>
