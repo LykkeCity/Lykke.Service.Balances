@@ -8,6 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Lykke.AzureQueueIntegration" Version="2.3.0" />
     <PackageReference Include="Lykke.Common" Version="7.3.1" />
-    <PackageReference Include="Lykke.SettingsReader" Version="4.2.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="5.1.0" />
   </ItemGroup>
 </Project>
