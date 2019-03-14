@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
@@ -17,6 +18,7 @@ namespace Lykke.Service.Balances.Services.Wallet
     {
         private readonly IDatabase _redisDatabase;
         private readonly string _partitionKey;
+        private readonly IBalanceSnapshotRepository _balanceSnapshotRepository;
         private readonly IWalletsRepository _repository;
         private readonly TimeSpan _cacheExpiration;
         private readonly ILog _log;
@@ -27,13 +29,15 @@ namespace Lykke.Service.Balances.Services.Wallet
             TimeSpan cacheExpiration,
             [NotNull] ILogFactory logFactory,
             [NotNull] IDatabase redisDatabase,
-            [NotNull] string partitionKey)
+            [NotNull] string partitionKey,
+            [NotNull] IBalanceSnapshotRepository balanceSnapshotRepository)
         {
             if (logFactory == null) throw new ArgumentNullException(nameof(logFactory));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _cacheExpiration = cacheExpiration;
             _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
             _partitionKey = partitionKey ?? throw new ArgumentNullException(nameof(partitionKey));
+            _balanceSnapshotRepository = balanceSnapshotRepository ?? throw new ArgumentNullException(nameof(balanceSnapshotRepository));
             _log = logFactory.CreateLog(this);
         }
 
@@ -93,6 +97,7 @@ namespace Lykke.Service.Balances.Services.Wallet
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet, updateSequenceNumber);
             if (updated)
             {
+                // update redis cache
                 var cacheKey = GetCacheKey(walletId);
                 try
                 {
@@ -109,6 +114,23 @@ namespace Lykke.Service.Balances.Services.Wallet
                 catch (RedisConnectionException ex)
                 {
                     _log.Warning("Redis cache is not available", ex);
+                }
+
+                // update history
+                try
+                {
+                    await _balanceSnapshotRepository.Add(new BalanceSnapshot
+                    {
+                        Timestamp = DateTime.UtcNow,
+                        WalletId = walletId,
+                        AssetId = assetId,
+                        Balance = balance,
+                        Reserved = reserved
+                    });
+                }
+                catch (Exception ex) // todo: proceed with only expected exception types here
+                {
+                    _log.Warning("MongoDB balance snapshots are not available", ex);
                 }
             }
         }

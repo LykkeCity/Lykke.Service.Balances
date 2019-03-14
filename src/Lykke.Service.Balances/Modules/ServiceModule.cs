@@ -6,6 +6,7 @@ using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.MongoRepositories;
 using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;
@@ -29,6 +30,12 @@ namespace Lykke.Service.Balances.Modules
         {
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>()
+                .SingleInstance();
+
+            builder.Register(ctx => _appSettings.CurrentValue.BalancesService.BalanceSnapshots);
+            builder.RegisterType<BalanceSnapshotRepository>()
+                .WithParameter(TypedParameter.From(_appSettings.CurrentValue.BalancesService.BalanceSnapshots.TimeFrame))
+                .As<IBalanceSnapshotRepository>()
                 .SingleInstance();
 
             builder.RegisterType<TotalBalancesService>()
