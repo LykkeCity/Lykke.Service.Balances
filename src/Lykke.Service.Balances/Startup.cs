@@ -25,7 +25,8 @@ namespace Lykke.Service.Balances
                 options.Logs = logs =>
                 {
                     logs.AzureTableName = "BalancesServiceLog";
-                    logs.AzureTableConnectionStringResolver = settings => settings.BalancesService.Db.LogsConnString;
+                    logs.AzureTableConnectionStringResolver = settings => 
+                        settings.BalancesService.Db.LogsConnString;
                 };
             });
         }

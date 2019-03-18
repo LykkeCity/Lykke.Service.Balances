@@ -21,6 +21,10 @@ namespace Lykke.Service.Balances.MongoRepositories
         public void CreateIndexes()
         {
             GetCollection().Indexes.CreateOne(
+                Builders<BalanceSnapshot>.IndexKeys.Ascending(x => x.AssetId),
+                new CreateIndexOptions { Background = true }
+            );
+            GetCollection().Indexes.CreateOne(
                 Builders<BalanceSnapshot>.IndexKeys.Ascending(x => x.WalletId).Ascending(x => x.AssetId),
                 new CreateIndexOptions { Background = true }
             );

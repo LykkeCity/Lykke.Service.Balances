@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Models;
@@ -8,7 +9,6 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Service.Balances.Core.Domain;
 
 namespace Lykke.Service.Balances.Controllers
 {
@@ -52,7 +52,7 @@ namespace Lykke.Service.Balances.Controllers
             if (wallet == null)
                 return NotFound();
 
-            var actualBalance = new BalanceSnapshotModel
+            var actualBalance = new BalanceSnapshot
             {
                 WalletId = walletId,
                 AssetId = wallet.AssetId,
@@ -60,6 +60,8 @@ namespace Lykke.Service.Balances.Controllers
                 Reserved = wallet.Reserved,
                 Timestamp = timestamp
             };
+
+            await _balanceSnapshotRepository.Add(actualBalance);
 
             return Ok(actualBalance);
         }
@@ -82,7 +84,7 @@ namespace Lykke.Service.Balances.Controllers
                 Reserved = reserved
             });
             return Ok();
-        } 
+        }
 #endif
     }
 }
