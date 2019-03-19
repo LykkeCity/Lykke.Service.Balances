@@ -7,6 +7,7 @@ using Lykke.Service.Balances.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -33,7 +34,7 @@ namespace Lykke.Service.Balances.Controllers
         [Route("wallets/{walletId}/{assetId}/{timestamp}")]
         [SwaggerOperation("GetWalletBalanceAtMoment")]
         [ProducesResponseType(typeof(BalanceSnapshotModel), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetClientBalances(string walletId, string assetId, DateTime timestamp)
+        public async Task<IActionResult> GetWalletBalance(string walletId, string assetId, DateTime timestamp)
         {
             timestamp = timestamp.ToUniversalTime();
             var timeFrame = DateTime.UtcNow - timestamp;
@@ -64,6 +65,30 @@ namespace Lykke.Service.Balances.Controllers
             await _balanceSnapshotRepository.Add(actualBalance);
 
             return Ok(actualBalance);
+        }
+
+        [HttpGet]
+        [Route("assets/{assetId}/{timestamp}")]
+        [SwaggerOperation("GetAllWalletsBalances")]
+        [ProducesResponseType(typeof(List<BalanceSnapshotShortModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetAllWalletsBalances(string assetId, DateTime timestamp)
+        {
+            timestamp = timestamp.ToUniversalTime();
+            var timeFrame = DateTime.UtcNow - timestamp;
+            if (timeFrame < TimeSpan.Zero || timeFrame > _settings.TimeFrame)
+            {
+                return BadRequest();
+            }
+
+            var result = new List<BalanceSnapshotShortModel>
+            {
+                new BalanceSnapshotShortModel
+                {
+                    Balance = 666,
+                    WalletId = "fake wallet id"
+                }
+            };
+            return Ok(result);
         }
 
 
