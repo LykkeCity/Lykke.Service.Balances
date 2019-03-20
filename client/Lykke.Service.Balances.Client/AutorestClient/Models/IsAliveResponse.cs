@@ -24,7 +24,7 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the IsAliveResponse class.
         /// </summary>
-        public IsAliveResponse(bool isDebug, string name = default(string), string version = default(string), string env = default(string), IList<IssueIndicator> issueIndicators = default(IList<IssueIndicator>))
+        public IsAliveResponse(string name = default(string), string version = default(string), string env = default(string), bool? isDebug = default(bool?), IList<IssueIndicator> issueIndicators = default(IList<IssueIndicator>))
         {
             Name = name;
             Version = version;
@@ -41,37 +41,28 @@ namespace Lykke.Service.Balances.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Name")]
+        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Version")]
+        [JsonProperty(PropertyName = "version")]
         public string Version { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Env")]
+        [JsonProperty(PropertyName = "env")]
         public string Env { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "IsDebug")]
-        public bool IsDebug { get; set; }
+        [JsonProperty(PropertyName = "isDebug")]
+        public bool? IsDebug { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "IssueIndicators")]
+        [JsonProperty(PropertyName = "issueIndicators")]
         public IList<IssueIndicator> IssueIndicators { get; set; }
 
-        /// <summary>
-        /// Validate the object.
-        /// </summary>
-        /// <exception cref="Microsoft.Rest.ValidationException">
-        /// Thrown if validation fails
-        /// </exception>
-        public virtual void Validate()
-        {
-        }
     }
 }

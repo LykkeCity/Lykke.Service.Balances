@@ -9,25 +9,23 @@ namespace Lykke.Service.Balances.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class ClientBalanceByAssetIdModel
+    public partial class TotalAssetBalanceModel
     {
         /// <summary>
-        /// Initializes a new instance of the ClientBalanceByAssetIdModel
-        /// class.
+        /// Initializes a new instance of the TotalAssetBalanceModel class.
         /// </summary>
-        public ClientBalanceByAssetIdModel()
+        public TotalAssetBalanceModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ClientBalanceByAssetIdModel
-        /// class.
+        /// Initializes a new instance of the TotalAssetBalanceModel class.
         /// </summary>
-        public ClientBalanceByAssetIdModel(string assetId = default(string), string clientId = default(string))
+        public TotalAssetBalanceModel(double balance, string assetId = default(string))
         {
             AssetId = assetId;
-            ClientId = clientId;
+            Balance = balance;
             CustomInit();
         }
 
@@ -43,8 +41,18 @@ namespace Lykke.Service.Balances.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ClientId")]
-        public string ClientId { get; set; }
+        [JsonProperty(PropertyName = "Balance")]
+        public double Balance { get; set; }
 
+        /// <summary>
+        /// Validate the object.
+        /// </summary>
+        /// <exception cref="Microsoft.Rest.ValidationException">
+        /// Thrown if validation fails
+        /// </exception>
+        public virtual void Validate()
+        {
+            //Nothing to validate
+        }
     }
 }

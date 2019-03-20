@@ -1,5 +1,6 @@
 ﻿using Lykke.Service.Balances.AutorestClient.Models;
 using Lykke.Service.Balances.Client;
+using Lykke.Service.Balances.Client.Models;
 using Xunit;
 
 namespace Lykke.Service.Balances.Tests.ClientBalances

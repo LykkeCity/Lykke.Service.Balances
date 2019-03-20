@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -73,6 +74,7 @@ namespace Lykke.Service.Balances.Controllers
         [ProducesResponseType(typeof(List<BalanceSnapshotShortModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllWalletsBalances(string assetId, DateTime timestamp)
         {
+            // todo: fix DTO
             timestamp = timestamp.ToUniversalTime();
             var timeFrame = DateTime.UtcNow - timestamp;
             if (timeFrame < TimeSpan.Zero || timeFrame > _settings.TimeFrame)
@@ -80,14 +82,13 @@ namespace Lykke.Service.Balances.Controllers
                 return BadRequest();
             }
 
-            var result = new List<BalanceSnapshotShortModel>
+            var v = await _balanceSnapshotRepository.GetSnapshots(assetId, timestamp);
+
+            var result = v.Select(x => new BalanceSnapshotShortModel
             {
-                new BalanceSnapshotShortModel
-                {
-                    Balance = 666,
-                    WalletId = "fake wallet id"
-                }
-            };
+                Balance = x.Balance,
+                WalletId = x.WalletId
+            });
             return Ok(result);
         }
 

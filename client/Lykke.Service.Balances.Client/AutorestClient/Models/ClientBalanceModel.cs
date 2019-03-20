@@ -9,20 +9,20 @@ namespace Lykke.Service.Balances.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class ClientBalanceResponseModel
+    public partial class ClientBalanceModel
     {
         /// <summary>
-        /// Initializes a new instance of the ClientBalanceResponseModel class.
+        /// Initializes a new instance of the ClientBalanceModel class.
         /// </summary>
-        public ClientBalanceResponseModel()
+        public ClientBalanceModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ClientBalanceResponseModel class.
+        /// Initializes a new instance of the ClientBalanceModel class.
         /// </summary>
-        public ClientBalanceResponseModel(decimal balance, decimal reserved, string assetId = default(string))
+        public ClientBalanceModel(double balance, double reserved, string assetId = default(string))
         {
             AssetId = assetId;
             Balance = balance;
@@ -43,12 +43,12 @@ namespace Lykke.Service.Balances.AutorestClient.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Balance")]
-        public decimal Balance { get; set; }
+        public double Balance { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Reserved")]
-        public decimal Reserved { get; set; }
+        public double Reserved { get; set; }
 
         /// <summary>
         /// Validate the object.
