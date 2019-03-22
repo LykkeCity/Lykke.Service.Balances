@@ -114,7 +114,10 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                     AssetId = wallet.AssetId,
                     Balance = wallet.NewBalance,
                     Reserved = wallet.NewReserved,
-                    SequenceNumber = header.SequenceNumber
+                    OldBalance = wallet.OldBalance,
+                    OldReserved = wallet.OldReserved,
+                    SequenceNumber = header.SequenceNumber,
+                    Timestamp = header.Timestamp
                 }, "balances");
             }
         }
