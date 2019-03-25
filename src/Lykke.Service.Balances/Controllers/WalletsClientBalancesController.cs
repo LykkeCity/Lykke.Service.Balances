@@ -2,7 +2,7 @@
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Models;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
