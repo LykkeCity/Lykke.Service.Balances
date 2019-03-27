@@ -28,7 +28,7 @@
     <PackageReference Include="Lykke.Service.MatchingEngine.Contracts" Version="1.2.1" />
     <PackageReference Include="Lykke.Service.Registration" Version="2.2.0" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
-    <PackageReference Include="Lykke.SettingsReader" Version="5.1.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="5.2.0" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
@@ -37,9 +37,13 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\client\Lykke.Service.Balances.Client\Lykke.Service.Balances.Client.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances..Core\Lykke.Service.Balances.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.AzureRepositories\Lykke.Service.Balances.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.Balances.Services\Lykke.Service.Balances.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Workflow\Events\" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>

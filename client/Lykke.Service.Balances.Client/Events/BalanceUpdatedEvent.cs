@@ -1,7 +1,7 @@
 ﻿using System;
 using ProtoBuf;
 
-namespace Lykke.Service.Balances.Workflow.Events
+namespace Lykke.Service.Balances.Client.Events
 {
     [ProtoContract]
     public class BalanceUpdatedEvent

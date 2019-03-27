@@ -10,10 +10,11 @@ using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.Balances.Client;
+using Lykke.Service.Balances.Client.Events;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Settings;
 using Lykke.Service.Balances.Workflow.Commands;
-using Lykke.Service.Balances.Workflow.Events;
 
 namespace Lykke.Service.Balances.Workflow.Handlers
 {
@@ -118,7 +119,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                     OldReserved = wallet.OldReserved,
                     SequenceNumber = header.SequenceNumber,
                     Timestamp = header.Timestamp
-                }, "balances");
+                }, BoundedContext.Name);
             }
         }
 
@@ -132,7 +133,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                     AssetId = wallet.AssetId,
                     BalanceDelta = ParseNullabe(wallet.NewBalance) - ParseNullabe(wallet.OldBalance),
                     SequenceNumber = header.SequenceNumber
-                }, "balances", "balances");
+                }, BoundedContext.Name, BoundedContext.Name);
             }
         }
         private decimal ParseNullabe(string value)
