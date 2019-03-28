@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
+using Lykke.Service.Balances.Client.Events;
 using Lykke.Service.Balances.Core.Services.Wallets;
-using Lykke.Service.Balances.Workflow.Events;
 
 namespace Lykke.Service.Balances.Workflow.Projections
 {

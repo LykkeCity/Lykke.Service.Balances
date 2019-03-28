@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>Lykke.Service.Balances.Core</AssemblyName>
     <RootNamespace>Lykke.Service.Balances.Core</RootNamespace>
     <Version>1.0.0</Version>
@@ -8,6 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Lykke.AzureQueueIntegration" Version="2.3.0" />
     <PackageReference Include="Lykke.Common" Version="7.3.1" />
-    <PackageReference Include="Lykke.SettingsReader" Version="4.2.0" />
+    <PackageReference Include="Lykke.SettingsReader" Version="5.2.0" />
   </ItemGroup>
 </Project>

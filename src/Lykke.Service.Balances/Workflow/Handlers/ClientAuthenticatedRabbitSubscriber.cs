@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.Balances.Client;
 using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Settings;
 using Lykke.Service.Registration.Models;
@@ -24,8 +25,6 @@ namespace Lykke.Service.Balances.Workflow.Handlers
         private readonly RabbitMqSettings _rabbitMqSettings;
         private IStopable _subscriber;
 
-        private const string QueueName = "balances";
-
         public ClientAuthenticatedRabbitSubscriber(
             [NotNull] ICachedWalletsRepository cachedWalletsRepository,
             [NotNull] ILogFactory logFactory,
@@ -40,7 +39,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .ForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, QueueName);
+                .ForSubscriber(_rabbitMqSettings.ConnectionString, _rabbitMqSettings.Exchange, BoundedContext.Name);
 
             _subscriber = new RabbitMqSubscriber<ClientAuthInfo>(
                     _logFactory,

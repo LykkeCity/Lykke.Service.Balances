@@ -8,11 +8,12 @@ using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
 using Lykke.Service.Balances.Settings;
 using Lykke.Service.Balances.Workflow.Commands;
-using Lykke.Service.Balances.Workflow.Events;
 using Lykke.Service.Balances.Workflow.Handlers;
 using Lykke.Service.Balances.Workflow.Projections;
 using Lykke.SettingsReader;
 using System.Collections.Generic;
+using Lykke.Service.Balances.Client;
+using Lykke.Service.Balances.Client.Events;
 
 namespace Lykke.Service.Balances.Modules
 {
@@ -77,19 +78,19 @@ namespace Lykke.Service.Balances.Modules
                         environment: "lykke",
                         exclusiveQueuePostfix: "k8s")),
 
-                    Register.BoundedContext("balances")
+                    Register.BoundedContext(BoundedContext.Name)
                         .ListeningCommands(typeof(UpdateTotalBalanceCommand))
                         .On(defaultPipeline)
                         .WithCommandsHandler<TotalBalanceCommandHandler>()
                         .PublishingEvents(typeof(BalanceUpdatedEvent))
                         .With(defaultRoute)
                         .ListeningEvents(typeof(BalanceUpdatedEvent))
-                        .From("balances").On(defaultRoute)
-                        .WithProjection(typeof(BalancesUpdateProjection), "balances"),
+                        .From(BoundedContext.Name).On(defaultRoute)
+                        .WithProjection(typeof(BalancesUpdateProjection), BoundedContext.Name),
 
                     Register.DefaultRouting
                         .PublishingCommands(typeof(UpdateTotalBalanceCommand))
-                        .To("balances").With(defaultPipeline)
+                        .To(BoundedContext.Name).With(defaultPipeline)
                 );
 
                 engine.StartPublishers();
