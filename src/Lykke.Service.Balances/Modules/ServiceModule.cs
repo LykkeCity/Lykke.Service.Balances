@@ -5,7 +5,6 @@ using Lykke.Sdk;
 using Lykke.Service.Balances.AzureRepositories;
 using Lykke.Service.Balances.Core.Domain;
 using Lykke.Service.Balances.Core.Services;
-using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Services;
 using Lykke.Service.Balances.Services.Wallet;
 using Lykke.Service.Balances.Settings;

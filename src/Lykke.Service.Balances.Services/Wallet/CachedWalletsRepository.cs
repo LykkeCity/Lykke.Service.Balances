@@ -2,13 +2,13 @@
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.Service.Balances.Core.Domain;
-using Lykke.Service.Balances.Core.Services.Wallets;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lykke.Service.Balances.Core.Services;
 
 namespace Lykke.Service.Balances.Services.Wallet
 {
@@ -86,9 +86,10 @@ namespace Lykke.Service.Balances.Services.Wallet
                 _log);
         }
 
-        public async Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved, long updateSequenceNumber)
+        public async Task UpdateBalanceAsync(string walletId, string assetId, decimal balance, decimal reserved,
+            long updateSequenceNumber, DateTime? timestamp)
         {
-            var wallet = CachedWalletModel.Create(assetId, balance, reserved, updateSequenceNumber);
+            var wallet = CachedWalletModel.Create(assetId, balance, reserved, timestamp);
 
             var updated = await _repository.UpdateBalanceAsync(walletId, wallet, updateSequenceNumber);
             if (updated)

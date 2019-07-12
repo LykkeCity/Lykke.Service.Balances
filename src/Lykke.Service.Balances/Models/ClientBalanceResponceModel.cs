@@ -1,4 +1,5 @@
-﻿using Lykke.Service.Balances.Core.Domain;
+﻿using System;
+using Lykke.Service.Balances.Core.Domain;
 
 namespace Lykke.Service.Balances.Models
 {
@@ -9,6 +10,7 @@ namespace Lykke.Service.Balances.Models
         public string AssetId { get; set; }
         public decimal Balance { get; set; }
         public decimal Reserved { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public static ClientBalanceModel Create(IWallet src)
         {
@@ -16,7 +18,8 @@ namespace Lykke.Service.Balances.Models
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance,
-                Reserved = src.Reserved
+                Reserved = src.Reserved,
+                UpdatedAt = src.UpdatedAt
             };
         }
     }

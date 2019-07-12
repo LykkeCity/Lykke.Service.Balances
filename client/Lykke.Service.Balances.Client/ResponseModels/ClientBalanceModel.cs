@@ -1,4 +1,5 @@
-﻿using Lykke.Service.Balances.AutorestClient.Models;
+﻿using System;
+using Lykke.Service.Balances.AutorestClient.Models;
 
 namespace Lykke.Service.Balances.Client.ResponseModels
 {
@@ -8,6 +9,7 @@ namespace Lykke.Service.Balances.Client.ResponseModels
         public decimal Balance { get; set; }
         public decimal Reserved { get; set; }
         public string ErrorMessage { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public static ClientBalanceModel Create(ClientBalanceResponseModel src)
         {
@@ -15,7 +17,8 @@ namespace Lykke.Service.Balances.Client.ResponseModels
             {
                 AssetId = src.AssetId,
                 Balance = src.Balance,
-                Reserved = src.Reserved
+                Reserved = src.Reserved,
+                UpdatedAt = src.UpdatedAt
             };
         }
     }
