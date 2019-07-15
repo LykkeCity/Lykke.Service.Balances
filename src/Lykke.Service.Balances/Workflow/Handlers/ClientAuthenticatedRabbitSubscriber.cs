@@ -10,7 +10,7 @@ using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Client;
-using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Core.Services;
 using Lykke.Service.Balances.Settings;
 using Lykke.Service.Registration.Models;
 

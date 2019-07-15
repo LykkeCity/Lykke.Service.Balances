@@ -1,5 +1,4 @@
 ﻿using Lykke.Service.Balances.Core.Services;
-using Lykke.Service.Balances.Core.Services.Wallets;
 using Lykke.Service.Balances.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

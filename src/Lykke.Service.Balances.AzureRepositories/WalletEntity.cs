@@ -1,4 +1,5 @@
-﻿using Lykke.AzureStorage.Tables;
+﻿using System;
+using Lykke.AzureStorage.Tables;
 using Lykke.AzureStorage.Tables.Entity.Annotation;
 using Lykke.AzureStorage.Tables.Entity.ValueTypesMerging;
 using Lykke.Service.Balances.Core.Domain;
@@ -12,6 +13,7 @@ namespace Lykke.Service.Balances.AzureRepositories
         public string AssetId => RowKey;
         public decimal Balance { get; set; }
         public decimal Reserved { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public long? UpdateSequenceNumber { get; set; }
 
         internal static string GeneratePartitionKey(string walletId) => walletId;
@@ -25,7 +27,8 @@ namespace Lykke.Service.Balances.AzureRepositories
                 RowKey = GenerateRowKey(src.AssetId),
                 Balance = src.Balance,
                 Reserved = src.Reserved,
-                UpdateSequenceNumber = updateSequenceNumber
+                UpdateSequenceNumber = updateSequenceNumber,
+                UpdatedAt = src.UpdatedAt
             };
         }
     }

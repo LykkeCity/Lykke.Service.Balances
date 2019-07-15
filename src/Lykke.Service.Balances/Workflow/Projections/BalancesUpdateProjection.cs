@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Service.Balances.Client.Events;
-using Lykke.Service.Balances.Core.Services.Wallets;
+using Lykke.Service.Balances.Core.Services;
 
 namespace Lykke.Service.Balances.Workflow.Projections
 {
@@ -27,7 +27,8 @@ namespace Lykke.Service.Balances.Workflow.Projections
                 evt.AssetId,
                 decimal.Parse(evt.Balance),
                 decimal.Parse(evt.Reserved),
-                evt.SequenceNumber);
+                evt.SequenceNumber,
+                evt.Timestamp);
 
             _chaosKitty.Meow("Problem with Azure Table Storage");
         }
