@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
+using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.Service.Balances.Client.Events;
 using Lykke.Service.Balances.Core.Services;
+using Lykke.Service.Balances.Services;
 
 namespace Lykke.Service.Balances.Workflow.Projections
 {
@@ -22,6 +24,7 @@ namespace Lykke.Service.Balances.Workflow.Projections
 
         public async Task Handle(BalanceUpdatedEvent evt)
         {
+            var operation = TelemetryHelper.InitTelemetryOperation($"Processing {nameof(BalanceUpdatedEvent)} message", evt.WalletId);
             await _cachedWalletsRepository.UpdateBalanceAsync(
                 evt.WalletId,
                 evt.AssetId,
@@ -31,6 +34,8 @@ namespace Lykke.Service.Balances.Workflow.Projections
                 evt.Timestamp);
 
             _chaosKitty.Meow("Problem with Azure Table Storage");
+
+            TelemetryHelper.SubmitOperationResult(operation);
         }
     }
 }
