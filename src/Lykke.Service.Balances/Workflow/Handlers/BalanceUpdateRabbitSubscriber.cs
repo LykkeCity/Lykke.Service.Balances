@@ -70,6 +70,7 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(func)
                 .CreateDefaultBinding()
+                .SetAlternativeExchange(_rabbitMqSettings.AlternateConnectionString)
                 .Start();
         }
 
