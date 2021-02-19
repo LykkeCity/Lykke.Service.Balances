@@ -56,11 +56,12 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                 QueueName = $"{QueueName}.{messageType}",
                 ExchangeName = _rabbitMqSettings.Exchange,
                 RoutingKey = ((int)messageType).ToString(),
-                IsDurable = QueueDurable
+                IsDurable = QueueDurable,
+                DeadLetterExchangeName = $"{_rabbitMqSettings.Exchange}.dlx"
             };
 
             return new RabbitMqSubscriber<T>(
-                    _logFactory, 
+                    _logFactory,
                     settings,
                     new ResilientErrorHandlingStrategy(_logFactory, settings,
                         retryTimeout: TimeSpan.FromSeconds(10),
@@ -70,7 +71,6 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                 .Subscribe(func)
                 .CreateDefaultBinding()
                 .SetAlternativeExchange(_rabbitMqSettings.AlternateConnectionString)
-                .SetDeduplicator(new InMemoryDeduplcator(TimeSpan.FromDays(1)))
                 .Start();
         }
 
