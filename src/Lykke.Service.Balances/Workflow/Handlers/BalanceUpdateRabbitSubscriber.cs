@@ -57,7 +57,6 @@ namespace Lykke.Service.Balances.Workflow.Handlers
                 ExchangeName = _rabbitMqSettings.Exchange,
                 RoutingKey = ((int)messageType).ToString(),
                 IsDurable = QueueDurable,
-                DeadLetterExchangeName = $"{_rabbitMqSettings.Exchange}.dlx"
             };
 
             return new RabbitMqSubscriber<T>(
