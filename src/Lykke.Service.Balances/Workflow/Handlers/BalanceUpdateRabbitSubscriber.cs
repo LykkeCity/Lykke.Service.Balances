@@ -8,7 +8,6 @@ using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.MatchingEngine.Connector.Models.Events;
 using Lykke.RabbitMqBroker;
-using Lykke.RabbitMqBroker.Deduplication;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Balances.Client;
 using Lykke.Service.Balances.Client.Events;
@@ -46,23 +45,18 @@ namespace Lykke.Service.Balances.Workflow.Handlers
             _subscribers.Add(Subscribe<CashOutEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashOut, ProcessMessageAsync));
             _subscribers.Add(Subscribe<CashTransferEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashTransfer, ProcessMessageAsync));
             _subscribers.Add(Subscribe<ExecutionEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.Order, ProcessMessageAsync));
-
-            _subscribers.Add(Subscribe<CashInEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashIn, ProcessMessageAsync, true));
-            _subscribers.Add(Subscribe<CashOutEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashOut, ProcessMessageAsync, true));
-            _subscribers.Add(Subscribe<CashTransferEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.CashTransfer, ProcessMessageAsync, true));
-            _subscribers.Add(Subscribe<ExecutionEvent>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType.Order, ProcessMessageAsync, true));
         }
 
-        private RabbitMqSubscriber<T> Subscribe<T>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType messageType, Func<T, Task> func, bool useDlx = false)
+        private RabbitMqSubscriber<T> Subscribe<T>(Lykke.MatchingEngine.Connector.Models.Events.Common.MessageType messageType, Func<T, Task> func)
         {
             var settings = new RabbitMqSubscriptionSettings
             {
                 ConnectionString = _rabbitMqSettings.ConnectionString,
-                QueueName = $"{QueueName}.{messageType}{(useDlx ? ".v2" : string.Empty)}",
+                QueueName = $"{QueueName}.{messageType}.v2",
                 ExchangeName = _rabbitMqSettings.Exchange,
                 RoutingKey = ((int)messageType).ToString(),
                 IsDurable = QueueDurable,
-                DeadLetterExchangeName = useDlx ? $"{_rabbitMqSettings.Exchange}.dlx" : null
+                DeadLetterExchangeName = $"{_rabbitMqSettings.Exchange}.dlx"
             };
 
             return new RabbitMqSubscriber<T>(
